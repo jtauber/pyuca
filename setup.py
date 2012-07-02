@@ -4,6 +4,7 @@ setup(
     name = "pyuca",
     version = "0.2",
     description = "a Python implementation of the Unicode Collation Algorithm",
+    license = "MIT",
     url = "http://github.com/jtauber/pyuca",
     author = "James Tauber",
     author_email = "jtauber@jtauber.com",
