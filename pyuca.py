@@ -108,10 +108,9 @@ class Collator:
                         collElement = x[begin:begin + end + 1]
                         x = x[begin + 1:]
                         
-                        alt = collElement[1]
                         chars = collElement[2:-1].split(".")
                         
-                        collElements.append((alt, chars))
+                        collElements.append(tuple(int(x, 16) for x in chars))
                     integer_points = [int(ch, 16) for ch in charList]
                     self.table.add(integer_points, collElements)
     
@@ -137,7 +136,7 @@ class Collator:
             if level:
                 sort_key.append(0)  # level separator
             for element in collation_elements:
-                ce_l = int(element[1][level], 16)
+                ce_l = element[level]
                 if ce_l:
                     sort_key.append(ce_l)
         
