@@ -1,10 +1,9 @@
 # pyuca - Unicode Collation Algorithm
-# Version: 2012-06-21
 #
 # James Tauber
 # http://jtauber.com/
 
-# Copyright (c) 2006-2012 James Tauber and contributors
+# Copyright (c) 2006-2013 James Tauber and contributors
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
