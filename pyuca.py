@@ -102,9 +102,9 @@ class Collator:
                 while True:
                     begin = x.find("[")
                     if begin == -1:
-                        break                
+                        break
                     end = x[begin:].find("]")
-                    collElement = x[begin:begin+end+1]
+                    collElement = x[begin:begin + end + 1]
                     x = x[begin + 1:]
                     
                     alt = collElement[1]
@@ -134,7 +134,7 @@ class Collator:
         
         for level in range(4):
             if level:
-                sort_key.append(0) # level separator
+                sort_key.append(0)  # level separator
             for element in collation_elements:
                 ce_l = int(element[1][level], 16)
                 if ce_l:
