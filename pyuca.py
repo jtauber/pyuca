@@ -97,22 +97,22 @@ class Collator:
                     pass
                 else:
                     semicolon = line.find(";")
-                    charList = line[:semicolon].strip().split()
+                    char_list = line[:semicolon].strip().split()
                     x = line[semicolon:]
-                    collElements = []
+                    coll_elements = []
                     while True:
                         begin = x.find("[")
                         if begin == -1:
                             break
                         end = x[begin:].find("]")
-                        collElement = x[begin:begin + end + 1]
+                        coll_element = x[begin:begin + end + 1]
                         x = x[begin + 1:]
                         
-                        chars = collElement[2:-1].split(".")
+                        chars = coll_element[2:-1].split(".")
                         
-                        collElements.append(tuple(int(x, 16) for x in chars))
-                    integer_points = [int(ch, 16) for ch in charList]
-                    self.table.add(integer_points, collElements)
+                        coll_elements.append(tuple(int(x, 16) for x in chars))
+                    integer_points = [int(ch, 16) for ch in char_list]
+                    self.table.add(integer_points, coll_elements)
     
     def sort_key(self, string):
         
