@@ -50,7 +50,7 @@ class Node:
     
     def __init__(self):
         self.value = None
-        self.children = {}
+        self.children = None
 
 
 class Trie:
@@ -61,6 +61,8 @@ class Trie:
     def add(self, key, value):
         curr_node = self.root
         for part in key:
+            if curr_node.children is None:
+                curr_node.children = {}
             curr_node = curr_node.children.setdefault(part, Node())
         curr_node.value = value
     
@@ -68,7 +70,7 @@ class Trie:
         curr_node = self.root
         remainder = key
         for part in key:
-            if part not in curr_node.children:
+            if curr_node.children is None or part not in curr_node.children:
                 break
             curr_node = curr_node.children[part]
             remainder = remainder[1:]
