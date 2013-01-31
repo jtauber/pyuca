@@ -47,6 +47,7 @@ but you can always subset this for just the characters you are dealing with.
 
 
 class Node:
+    __slots__ = ("value", "children")
     
     def __init__(self):
         self.value = None
