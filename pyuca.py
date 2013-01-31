@@ -125,11 +125,12 @@ class Collator:
             value, lookup_key = self.table.find_prefix(lookup_key)
             if not value:
                 # Calculate implicit weighting for CJK Ideographs
-                # contributed by David Schneider 2009-07-27
                 # http://www.unicode.org/reports/tr10/#Implicit_Weights
-                value = []
-                value.append((0xFB40 + (lookup_key[0] >> 15), 0x0020, 0x0002, 0x0001))
-                value.append(((lookup_key[0] & 0x7FFF) | 0x8000, 0x0000, 0x0000, 0x0000))
+                key = lookup_key[0]
+                value = [
+                    (0xFB40 + (key >> 15), 0x0020, 0x0002, 0x0001),
+                    ((key & 0x7FFF) | 0x8000, 0x0000, 0x0000, 0x0000)
+                ]
                 lookup_key = lookup_key[1:]
             collation_elements.extend(value)
         sort_key = []
