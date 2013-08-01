@@ -20,7 +20,7 @@ Usage example:
     
     sorted_words = sorted(words, key=c.sort_key)
 
-``allkeys.txt`` (1 MB) is available at
+``allkeys.txt`` (1.6 MB) is available at
 
 http://www.unicode.org/Public/UCA/latest/allkeys.txt
 
