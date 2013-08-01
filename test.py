@@ -6,10 +6,14 @@
 # this also assumes you've downloaded allkeys.txt from
 # http://www.unicode.org/Public/UCA/latest/allkeys.txt
 
-from pyuca import Collator
+from unittest import TestCase
 
 
-c = Collator("allkeys.txt")
-
-assert sorted(["cafe", "caff", u"café"]) == ["cafe", "caff", u"café"]
-assert sorted(["cafe", "caff", u"café"], key=c.sort_key) == ["cafe", u"café", "caff"]
+class SmokeTest(TestCase):
+    
+    def test_cafe(self):
+        from pyuca import Collator
+        c = Collator("allkeys.txt")
+        
+        self.assertEqual(sorted(["cafe", "caff", u"café"]), ["cafe", "caff", u"café"])
+        self.assertEqual(sorted(["cafe", "caff", u"café"], key=c.sort_key), ["cafe", u"café", "caff"])
