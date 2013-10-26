@@ -20,7 +20,5 @@ Usage example:
     
     sorted_words = sorted(words, key=c.sort_key)
 
-``allkeys.txt`` (1.6 MB) is available at
-
-http://www.unicode.org/Public/UCA/latest/allkeys.txt
-
+Python code is made available under an MIT license (see `LICENSE`).
+`allkeys.txt` is made available under the similar license defined in `LICENSE-allkeys`.
