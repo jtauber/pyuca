@@ -3,9 +3,6 @@
 # to work on both Python2 and Python3, I use u"..." but that means Python3
 # must be 3.3 or later.
 
-# this also assumes you've downloaded allkeys.txt from
-# http://www.unicode.org/Public/UCA/latest/allkeys.txt
-
 from unittest import TestCase
 
 

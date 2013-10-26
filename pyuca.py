@@ -37,12 +37,6 @@ Usage example:
     c = Collator("allkeys.txt")
 
     sorted_words = sorted(words, key=c.sort_key)
-
-allkeys.txt (1 MB) is available at
-
-    http://www.unicode.org/Public/UCA/latest/allkeys.txt
-
-but you can always subset this for just the characters you are dealing with.
 """
 
 
