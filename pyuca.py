@@ -74,7 +74,7 @@ class Trie:
 
 class Collator:
 
-    def __init__(self, filename):
+    def __init__(self, filename="allkeys.txt"):
 
         self.table = Trie()
         self.load(filename)
