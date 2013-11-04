@@ -39,6 +39,8 @@ Usage example:
     sorted_words = sorted(words, key=c.sort_key)
 """
 
+import os.path
+
 
 class Node:
     __slots__ = ("value", "children")
@@ -74,8 +76,10 @@ class Trie:
 
 class Collator:
 
-    def __init__(self, filename="allkeys.txt"):
-
+    def __init__(self, filename=None):
+        
+        if filename is None:
+            filename = os.path.join(os.path.dirname(__file__), "allkeys.txt")
         self.table = Trie()
         self.load(filename)
 
