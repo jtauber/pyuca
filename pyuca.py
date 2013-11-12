@@ -34,9 +34,12 @@ Ancient Greek correctly.
 Usage example:
 
     from pyuca import Collator
-    c = Collator("allkeys.txt")
+    c = Collator()
 
     sorted_words = sorted(words, key=c.sort_key)
+
+Collator can also take an optional filename for specifying a custom collation
+element table.
 """
 
 import os.path

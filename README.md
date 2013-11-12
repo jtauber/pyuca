@@ -16,7 +16,7 @@ Here is how to use the ``pyuca`` module.
 Usage example:
 
     from pyuca import Collator
-    c = Collator("allkeys.txt")
+    c = Collator()
     
     sorted_words = sorted(words, key=c.sort_key)
 
