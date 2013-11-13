@@ -10,7 +10,7 @@ class SmokeTest(TestCase):
     
     def test_cafe(self):
         from pyuca import Collator
-        c = Collator("allkeys.txt")
+        c = Collator()
         
         self.assertEqual(sorted(["cafe", "caff", u"café"]), ["cafe", "caff", u"café"])
         self.assertEqual(sorted(["cafe", "caff", u"café"], key=c.sort_key), ["cafe", u"café", "caff"])

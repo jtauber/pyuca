@@ -8,5 +8,6 @@ setup(
     url = "http://github.com/jtauber/pyuca",
     author = "James Tauber",
     author_email = "jtauber@jtauber.com",
-    py_modules = ["pyuca"],
+    packages = ["pyuca"],
+    package_data={"": ["allkeys.txt"]}
 )
