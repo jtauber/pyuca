@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "pyuca",
-    version = "0.6",
+    version = "0.6.1",
     description = "a Python implementation of the Unicode Collation Algorithm",
     license = "MIT",
     url = "http://github.com/jtauber/pyuca",
