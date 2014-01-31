@@ -14,3 +14,15 @@ class SmokeTest(TestCase):
 
         self.assertEqual(sorted(["cafe", "caff", u"café"]), ["cafe", "caff", u"café"])
         self.assertEqual(sorted(["cafe", "caff", u"café"], key=c.sort_key), ["cafe", u"café", "caff"])
+
+
+class TrieTest(TestCase):
+
+    def test_trie(self):
+        from pyuca.trie import Trie
+
+        t = Trie()
+        t.add("foo", "bar")
+        self.assertEqual(t.find_prefix("fo"), (None, ""))
+        self.assertEqual(t.find_prefix("foo"), ("bar", ""))
+        self.assertEqual(t.find_prefix("food"), ("bar", "d"))
