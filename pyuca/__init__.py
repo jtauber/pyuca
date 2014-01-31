@@ -16,4 +16,4 @@ Collator can also take an optional filename for specifying a custom collation
 element table.
 """
 
-from collator import Collator
+from collator import Collator  # noqa
