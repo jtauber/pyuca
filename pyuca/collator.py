@@ -3,6 +3,7 @@ import os.path
 from .trie import Trie
 from .utils import hexstrings2int
 
+
 class Collator:
 
     def __init__(self, filename=None):
