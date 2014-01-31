@@ -1,7 +1,7 @@
 import os.path
 
 from .trie import Trie
-
+from .utils import hexstrings2int
 
 class Collator:
 
@@ -40,9 +40,8 @@ class Collator:
 
                         chars = coll_element[2:-1].split(".")
 
-                        coll_elements.append(tuple(int(x, 16) for x in chars))
-                    integer_points = [int(ch, 16) for ch in char_list]
-                    self.table.add(integer_points, coll_elements)
+                        coll_elements.append(hexstrings2int(chars))
+                    self.table.add(hexstrings2int(char_list), coll_elements)
 
     def sort_key(self, string):
 
