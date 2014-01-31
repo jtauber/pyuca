@@ -7,6 +7,6 @@ install:
   - pip install coveralls
 script:
   - flake8 pyuca
-  - coverage run test.py
+  - coverage run --branch --source pyuca test.py
 after_success:
   - coveralls
