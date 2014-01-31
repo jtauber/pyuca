@@ -17,7 +17,7 @@ Usage example:
 
     from pyuca import Collator
     c = Collator()
-    
+
     sorted_words = sorted(words, key=c.sort_key)
 
 Python code is made available under an MIT license (see `LICENSE`).

@@ -6,7 +6,7 @@ from .trie import Trie
 class Collator:
 
     def __init__(self, filename=None):
-        
+
         if filename is None:
             filename = os.path.join(os.path.dirname(__file__), "allkeys.txt")
         self.table = Trie()
@@ -22,7 +22,7 @@ class Collator:
                 line = line[:line.find("#")] + "\n"
                 line = line[:line.find("%")] + "\n"
                 line = line.strip()
-                
+
                 if line.startswith("@"):
                     pass
                 else:
@@ -37,17 +37,17 @@ class Collator:
                         end = x[begin:].find("]")
                         coll_element = x[begin:begin + end + 1]
                         x = x[begin + 1:]
-                        
+
                         chars = coll_element[2:-1].split(".")
-                        
+
                         coll_elements.append(tuple(int(x, 16) for x in chars))
                     integer_points = [int(ch, 16) for ch in char_list]
                     self.table.add(integer_points, coll_elements)
-    
+
     def sort_key(self, string):
-        
+
         collation_elements = []
-        
+
         lookup_key = [ord(ch) for ch in string]
         while lookup_key:
             value, lookup_key = self.table.find_prefix(lookup_key)
@@ -62,7 +62,7 @@ class Collator:
                 lookup_key = lookup_key[1:]
             collation_elements.extend(value)
         sort_key = []
-        
+
         for level in range(4):
             if level:
                 sort_key.append(0)  # level separator
@@ -70,5 +70,5 @@ class Collator:
                 ce_l = element[level]
                 if ce_l:
                     sort_key.append(ce_l)
-        
+
         return tuple(sort_key)
