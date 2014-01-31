@@ -3,7 +3,7 @@
 # to work on both Python2 and Python3, I use u"..." but that means Python3
 # must be 3.3 or later.
 
-from unittest import TestCase
+from unittest import TestCase, main
 
 
 class SmokeTest(TestCase):
@@ -26,3 +26,7 @@ class TrieTest(TestCase):
         self.assertEqual(t.find_prefix("fo"), (None, ""))
         self.assertEqual(t.find_prefix("foo"), ("bar", ""))
         self.assertEqual(t.find_prefix("food"), ("bar", "d"))
+
+
+if __name__ == "__main__":
+    main()
