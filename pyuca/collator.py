@@ -75,9 +75,10 @@ class Collator:
             if level:
                 sort_key.append(0)  # level separator
             for element in collation_elements:
-                ce_l = element[level]
-                if ce_l:
-                    sort_key.append(ce_l)
+                if len(element) > level:
+                    ce_l = element[level]
+                    if ce_l:
+                        sort_key.append(ce_l)
 
         return tuple(sort_key)
 
