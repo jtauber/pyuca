@@ -54,7 +54,7 @@ class Collator:
 
         lookup_key = [ord(ch) for ch in string]
         while lookup_key:
-            value, lookup_key = self.table.find_prefix(lookup_key)
+            S, value, lookup_key = self.table.find_prefix(lookup_key)
             if not value:
                 # Calculate implicit weighting for CJK Ideographs
                 # http://www.unicode.org/reports/tr10/#Implicit_Weights

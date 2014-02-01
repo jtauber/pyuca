@@ -23,9 +23,9 @@ class TrieTest(TestCase):
 
         t = Trie()
         t.add("foo", "bar")
-        self.assertEqual(t.find_prefix("fo"), (None, ""))
-        self.assertEqual(t.find_prefix("foo"), ("bar", ""))
-        self.assertEqual(t.find_prefix("food"), ("bar", "d"))
+        self.assertEqual(t.find_prefix("fo"), ("fo", None, ""))
+        self.assertEqual(t.find_prefix("foo"), ("foo", "bar", ""))
+        self.assertEqual(t.find_prefix("food"), ("foo", "bar", "d"))
 
 
 if __name__ == "__main__":
