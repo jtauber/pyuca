@@ -14,5 +14,5 @@ def display_collation_elements(collation_elements):
 
 def display_sort_key(sort_key):
     return " ".join(
-        "{:04X}".format(x) for x in sort_key
+        ("{:04X}".format(x) if x else "|") for x in sort_key
     )
