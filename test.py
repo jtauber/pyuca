@@ -17,6 +17,44 @@ class SmokeTest(TestCase):
         )
 
 
+class UtilsTest(TestCase):
+
+    def test_hexstrings2int(self):
+        from pyuca.utils import hexstrings2int
+        self.assertEqual(
+            hexstrings2int(["0000", "0001", "FFFF"]),
+            [0, 1, 65535]
+        )
+
+    def test_int2hexstrings(self):
+        from pyuca.utils import int2hexstrings
+        self.assertEqual(
+            int2hexstrings([0, 1, 65535]),
+            ["0000", "0001", "FFFF"]
+        )
+
+    def test_display_collation_elements(self):
+        from pyuca.utils import display_collation_elements
+        self.assertEqual(
+            display_collation_elements([[1, 2, 3], [4, 5]]),
+            "[0001.0002.0003], [0004.0005]"
+        )
+
+    def test_display_collation_elements_none(self):
+        from pyuca.utils import display_collation_elements
+        self.assertEqual(
+            display_collation_elements(None),
+            None
+        )
+
+    def test_display_sort_key(self):
+        from pyuca.utils import display_sort_key
+        self.assertEqual(
+            display_sort_key([0, 1, 65535]),
+            "| 0001 FFFF"
+        )
+
+
 class TrieTest(TestCase):
 
     def setUp(self):
