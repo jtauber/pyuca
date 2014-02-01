@@ -21,10 +21,13 @@ class Trie:
 
     def find_prefix(self, key):
         curr_node = self.root
-        remainder = key
-        for part in key:
+        success_index = 0
+        success_value = None
+        for i, part in enumerate(key):
             if curr_node.children is None or part not in curr_node.children:
                 break
             curr_node = curr_node.children[part]
-            remainder = remainder[1:]
-        return (curr_node.value, remainder)
+            if curr_node.value:
+                success_index = i + 1
+                success_value = curr_node.value
+        return key[:success_index], success_value, key[success_index:]
