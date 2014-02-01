@@ -44,8 +44,7 @@ class Collator:
                         coll_elements.append(hexstrings2int(chars))
                     self.table.add(hexstrings2int(char_list), coll_elements)
 
-    def sort_key(self, string):
-
+    def collation_elements(self, string):
         collation_elements = []
 
         lookup_key = [ord(ch) for ch in string]
@@ -61,6 +60,10 @@ class Collator:
                 ]
                 lookup_key = lookup_key[1:]
             collation_elements.extend(value)
+
+        return collation_elements
+
+    def sort_key_from_collation_elements(self, collation_elements):
         sort_key = []
 
         for level in range(4):
@@ -72,3 +75,8 @@ class Collator:
                     sort_key.append(ce_l)
 
         return tuple(sort_key)
+
+    def sort_key(self, string):
+
+        collation_elements = self.collation_elements(string)
+        return self.sort_key_from_collation_elements(collation_elements)
