@@ -8,11 +8,14 @@ def int2hexstrings(number_list):
 
 
 def display_collation_elements(collation_elements):
-    return ", ".join(
-        "[" + ".".join(
-            int2hexstrings(collation_element)
-        ) + "]" for collation_element in collation_elements
-    )
+    if collation_elements is None:
+        return None
+    else:
+        return ", ".join(
+            "[" + ".".join(
+                int2hexstrings(collation_element)
+            ) + "]" for collation_element in collation_elements
+        )
 
 
 def display_sort_key(sort_key):
