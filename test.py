@@ -33,24 +33,24 @@ class UtilsTest(TestCase):
             ["0000", "0001", "FFFF"]
         )
 
-    def test_display_collation_elements(self):
-        from pyuca.utils import display_collation_elements
+    def test_format_collation_elements(self):
+        from pyuca.utils import format_collation_elements
         self.assertEqual(
-            display_collation_elements([[1, 2, 3], [4, 5]]),
+            format_collation_elements([[1, 2, 3], [4, 5]]),
             "[0001.0002.0003], [0004.0005]"
         )
 
-    def test_display_collation_elements_none(self):
-        from pyuca.utils import display_collation_elements
+    def test_format_collation_elements_none(self):
+        from pyuca.utils import format_collation_elements
         self.assertEqual(
-            display_collation_elements(None),
+            format_collation_elements(None),
             None
         )
 
-    def test_display_sort_key(self):
-        from pyuca.utils import display_sort_key
+    def test_format_sort_key(self):
+        from pyuca.utils import format_sort_key
         self.assertEqual(
-            display_sort_key([0, 1, 65535]),
+            format_sort_key([0, 1, 65535]),
             "| 0001 FFFF"
         )
 

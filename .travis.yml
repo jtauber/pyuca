@@ -7,6 +7,8 @@ install:
 script:
   - flake8 .
   - coverage run --branch --source pyuca test.py
+  - coverage run --branch --source pyuca -m doctest pyuca/utils.py
+  - coverage run --branch --source pyuca full_test.py
   - coverage run --branch --source pyuca full_test.py
 after_success:
   - coveralls

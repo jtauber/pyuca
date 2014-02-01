@@ -1,7 +1,7 @@
 import sys
 
 from pyuca import Collator
-from pyuca.utils import display_sort_key
+from pyuca.utils import format_sort_key
 
 
 c = Collator()
@@ -19,7 +19,7 @@ with open("CollationTest/CollationTest_NON_IGNORABLE.txt") as f:
                 chr(int(point, 16)) for point in points
             )
             test_string_sort_key = c.sort_key(test_string)
-            x = display_sort_key(test_string_sort_key)
+            x = format_sort_key(test_string_sort_key)
             if prev_sort_key:
                 if prev_sort_key > test_string_sort_key:
                     failure += 1
