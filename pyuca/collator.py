@@ -16,13 +16,10 @@ class Collator:
     def load(self, filename):
         with open(filename) as keys_file:
             for line in keys_file:
-                if line.startswith("#") or line.startswith("%"):
+                line = line.split("#")[0].split("%")[0].strip()
+
+                if not line:
                     continue
-                if line.strip() == "":
-                    continue
-                line = line[:line.find("#")] + "\n"
-                line = line[:line.find("%")] + "\n"
-                line = line.strip()
 
                 if line.startswith("@"):
                     pass
