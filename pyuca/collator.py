@@ -78,14 +78,22 @@ class Collator:
                     break  # ???
 
             if not value:
-                # Calculate implicit weighting for CJK Ideographs
-                # http://www.unicode.org/reports/tr10/#Implicit_Weights
-                key = lookup_key[0]
-                value = [
-                    (0xFB40 + (key >> 15), 0x0020, 0x0002, 0x0001),
-                    ((key & 0x7FFF) | 0x8000, 0x0000, 0x0000, 0x0000)
-                ]
-                lookup_key = lookup_key[1:]
+
+                # implicit weighting
+
+                CP = lookup_key.pop(0)
+
+                if 0x4E00 <= CP <= 0x9FCC or CP in [0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F, 0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29]:
+                    BASE = 0xFB40
+                elif 0x3400 <= CP <= 0x4DB5 or 0x20000 <= CP <= 0x2A6D6 or 0x2A700 <= CP <= 0x2B734 or 0x2B740 <= CP <= 0x2B81D:
+                    BASE = 0xFB80
+                else:
+                    BASE = 0xFBC0
+
+                AAAA = BASE + (CP >> 15)
+                BBBB = (CP & 0x7FFF) | 0x8000
+                value = [[AAAA, 0x0020, 0x002], [BBBB, 0x0000, 0x0000]]
+
             collation_elements.extend(value)
 
         return collation_elements
