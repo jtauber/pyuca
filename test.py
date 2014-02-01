@@ -12,8 +12,14 @@ class SmokeTest(TestCase):
         from pyuca import Collator
         c = Collator()
 
-        self.assertEqual(sorted(["cafe", "caff", u"café"]), ["cafe", "caff", u"café"])
-        self.assertEqual(sorted([u"cafe", u"caff", u"café"], key=c.sort_key), ["cafe", u"café", "caff"])
+        self.assertEqual(
+            sorted(["cafe", "caff", u"café"]),
+            ["cafe", "caff", u"café"]
+        )
+        self.assertEqual(
+            sorted([u"cafe", u"caff", u"café"], key=c.sort_key),
+            ["cafe", u"café", "caff"]
+        )
 
 
 class TrieTest(TestCase):
@@ -55,21 +61,23 @@ class FromFullTest(TestCase):
     def test_3(self):
         self.assertEqual(
             self.c.sort_key(u"\u0FB2\u0F71\u0001\u0F80\u0061"),
-            (0x2571, 0x2587, 0x258A, 0x15EB, 0x0000, 0x0020, 0x0020, 0x0020, 0x0020, 0x0000, 0x0002, 0x0002, 0x0002, 0x0002, 0x0000)
+            (0x2571, 0x2587, 0x258A, 0x15EB, 0x0000, 0x0020, 0x0020, 0x0020,
+                0x0020, 0x0000, 0x0002, 0x0002, 0x0002, 0x0002, 0x0000)
         )
 
     def test_4(self):
         self.assertEqual(
             self.c.sort_key(u"\u4E00\u0021"),
-            (0xFB40, 0xCE00, 0x025D, 0x0000, 0x0020, 0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
+            (0xFB40, 0xCE00, 0x025D, 0x0000, 0x0020,
+                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
         )
 
     def test_5(self):
         self.assertEqual(
             self.c.sort_key(u"\u3400\u0021"),
-            (0xFB80, 0xB400, 0x025D, 0x0000, 0x0020, 0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
+            (0xFB80, 0xB400, 0x025D, 0x0000, 0x0020,
+                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
         )
-
 
 
 if __name__ == "__main__":
