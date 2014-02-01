@@ -1,7 +1,21 @@
 import os.path
+import re
 
 from .trie import Trie
 from .utils import hexstrings2int
+
+
+COLL_ELEMENT_PATTERN = r"""
+    \[
+    (\*|\.)
+    ([0-9A-Fa-f]{4})
+    \.
+    ([0-9A-Fa-f]{4})
+    \.
+    ([0-9A-Fa-f]{4})
+    (?:\.([0-9A-Fa-f]{4}))?
+\]
+"""
 
 
 class Collator:
@@ -21,25 +35,19 @@ class Collator:
                 if not line:
                     continue
 
-                if line.startswith("@"):
+                if line.startswith("@version"):
                     pass
                 else:
-                    semicolon = line.find(";")
-                    char_list = line[:semicolon].strip().split()
-                    x = line[semicolon:]
+                    a, b = line.split(";")
+                    char_list = hexstrings2int(a.split())
                     coll_elements = []
-                    while True:
-                        begin = x.find("[")
-                        if begin == -1:
-                            break
-                        end = x[begin:].find("]")
-                        coll_element = x[begin:begin + end + 1]
-                        x = x[begin + 1:]
-
-                        chars = coll_element[2:-1].split(".")
-
-                        coll_elements.append(hexstrings2int(chars))
-                    self.table.add(hexstrings2int(char_list), coll_elements)
+                    for x in re.finditer(COLL_ELEMENT_PATTERN, b.strip(), re.X):
+                        alt, weight1, weight2, weight3, weight4 = x.groups()
+                        weights = [weight1, weight2, weight3]
+                        if weight4:
+                            weights.append(weight4)
+                        coll_elements.append(hexstrings2int(weights))
+                    self.table.add(char_list, coll_elements)
 
     def collation_elements(self, string):
         collation_elements = []

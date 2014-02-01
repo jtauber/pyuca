@@ -1,6 +1,6 @@
 
 def hexstrings2int(hexstrings):
-    return tuple(int(hexstring, 16) for hexstring in hexstrings)
+    return [int(hexstring, 16) for hexstring in hexstrings]
 
 
 def display_collation_elements(collation_elements):
