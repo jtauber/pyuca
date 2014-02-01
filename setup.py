@@ -2,12 +2,18 @@ from setuptools import setup
 
 setup(
     name="pyuca",
-    version="0.6.1",
-    description="a Python implementation of the Unicode Collation Algorithm",
+    version="1.0",
+    description="a Python 3 implementation of the Unicode Collation Algorithm",
     license="MIT",
     url="http://github.com/jtauber/pyuca",
     author="James Tauber",
     author_email="jtauber@jtauber.com",
     packages=["pyuca"],
-    package_data={"": ["allkeys.txt"]}
+    package_data={"": ["allkeys.txt"]},
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.3",
+        "Topic :: Text Processing",
+    ],
 )
