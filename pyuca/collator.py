@@ -75,7 +75,7 @@ class Collator:
                 if z == [] and y is not None:
                     lookup_key = lookup_key[:i] + lookup_key[i + 1:]
                     value = y
-                    break # ???
+                    break  # ???
 
             if not value:
                 # Calculate implicit weighting for CJK Ideographs
