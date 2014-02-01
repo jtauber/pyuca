@@ -32,19 +32,31 @@ class TrieTest(TestCase):
         self.t.add("a", "yes")
         self.t.add("abc", "yes")
         self.assertEqual(self.t.find_prefix("abdc"), ("a", "yes", "bdc"))
+
+
 class FromFullTest(TestCase):
 
-    def test_1(self):
+    def setUp(self):
         from pyuca import Collator
-        c = Collator()
+        self.c = Collator()
 
-        self.assertEqual(c.sort_key(u"\u0332\u0334"), (0x0000, 0x004A, 0x0021, 0x0000, 0x0002, 0x0002, 0x0000))
+    def test_1(self):
+        self.assertEqual(
+            self.c.sort_key(u"\u0332\u0334"),
+            (0x0000, 0x004A, 0x0021, 0x0000, 0x0002, 0x0002, 0x0000)
+        )
 
     def test_2(self):
-        from pyuca import Collator
-        c = Collator()
+        self.assertEqual(
+            self.c.sort_key(u"\u0430\u0306\u0334"),
+            (0x1991, 0x0000, 0x0020, 0x004A, 0x0000, 0x0002, 0x0002, 0x0000)
+        )
 
-        self.assertEqual(c.sort_key(u"\u0430\u0306\u0334"), (0x1991, 0x0000, 0x0020, 0x004A, 0x0000, 0x0002, 0x0002, 0x0000))
+    def test_3(self):
+        self.assertEqual(
+            self.c.sort_key(u"\u0FB2\u0F71\u0001\u0F80\u0061"),
+            (0x2571, 0x2587, 0x258A, 0x15EB, 0x0000, 0x0020, 0x0020, 0x0020, 0x0020, 0x0000, 0x0002, 0x0002, 0x0002, 0x0002, 0x0000)
+        )
 
 
 if __name__ == "__main__":
