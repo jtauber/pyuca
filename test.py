@@ -13,7 +13,7 @@ class SmokeTest(TestCase):
         c = Collator()
 
         self.assertEqual(sorted(["cafe", "caff", u"café"]), ["cafe", "caff", u"café"])
-        self.assertEqual(sorted(["cafe", "caff", u"café"], key=c.sort_key), ["cafe", u"café", "caff"])
+        self.assertEqual(sorted([u"cafe", u"caff", u"café"], key=c.sort_key), ["cafe", u"café", "caff"])
 
 
 class TrieTest(TestCase):
@@ -26,6 +26,15 @@ class TrieTest(TestCase):
         self.assertEqual(t.find_prefix("fo"), ("fo", None, ""))
         self.assertEqual(t.find_prefix("foo"), ("foo", "bar", ""))
         self.assertEqual(t.find_prefix("food"), ("foo", "bar", "d"))
+
+
+class CombiningCharacterTest(TestCase):
+
+    def test_combining_characters(self):
+        from pyuca import Collator
+        c = Collator()
+
+        self.assertEqual(c.sort_key(u"\u0430\u0306\u0334"), (0x1991, 0x0000, 0x0020, 0x004A, 0x0000, 0x0002, 0x0002, 0x0000))
 
 
 if __name__ == "__main__":

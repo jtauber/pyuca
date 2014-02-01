@@ -3,11 +3,14 @@ def hexstrings2int(hexstrings):
     return [int(hexstring, 16) for hexstring in hexstrings]
 
 
+def int2hexstrings(number_list):
+    return ["{:04X}".format(n) for n in number_list]
+
+
 def display_collation_elements(collation_elements):
     return ", ".join(
         "[" + ".".join(
-            "{:04X}".format(n)
-            for n in collation_element
+            int2hexstrings(collation_element)
         ) + "]" for collation_element in collation_elements
     )
 

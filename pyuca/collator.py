@@ -5,6 +5,11 @@ import unicodedata
 from .trie import Trie
 from .utils import hexstrings2int
 
+try:
+    unichr
+except NameError:
+    unichr = chr
+
 
 COLL_ELEMENT_PATTERN = re.compile(r"""
     \[
@@ -61,13 +66,13 @@ class Collator:
 
             last_class = None
             for i, C in enumerate(lookup_key):
-                combining_class = unicodedata.combining(chr(C))
+                combining_class = unicodedata.combining(unichr(C))
                 if combining_class == 0 or combining_class == last_class:
                     break
                 last_class = combining_class
                 # C is a non-starter that is not blocked from S
                 x, y, z = self.table.find_prefix(S + [C])
-                if z == "" and y is not None:
+                if z == [] and y is not None:
                     lookup_key = lookup_key[:i] + lookup_key[i + 1:]
                     value = y
                     break # ???
