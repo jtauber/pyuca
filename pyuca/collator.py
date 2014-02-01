@@ -5,7 +5,7 @@ from .trie import Trie
 from .utils import hexstrings2int
 
 
-COLL_ELEMENT_PATTERN = r"""
+COLL_ELEMENT_PATTERN = re.compile(r"""
     \[
     (\*|\.)
     ([0-9A-Fa-f]{4})
@@ -15,7 +15,7 @@ COLL_ELEMENT_PATTERN = r"""
     ([0-9A-Fa-f]{4})
     (?:\.([0-9A-Fa-f]{4}))?
 \]
-"""
+""", re.X)
 
 
 class Collator:
@@ -41,7 +41,7 @@ class Collator:
                     a, b = line.split(";")
                     char_list = hexstrings2int(a.split())
                     coll_elements = []
-                    for x in re.finditer(COLL_ELEMENT_PATTERN, b.strip(), re.X):
+                    for x in COLL_ELEMENT_PATTERN.finditer(b.strip()):
                         alt, weight1, weight2, weight3, weight4 = x.groups()
                         weights = [weight1, weight2, weight3]
                         if weight4:
