@@ -1,5 +1,6 @@
 import os.path
 import re
+import unicodedata
 
 from .trie import Trie
 from .utils import hexstrings2int
@@ -55,6 +56,22 @@ class Collator:
         lookup_key = [ord(ch) for ch in string]
         while lookup_key:
             S, value, lookup_key = self.table.find_prefix(lookup_key)
+
+            # handle non-starters
+
+            last_class = None
+            for i, C in enumerate(lookup_key):
+                combining_class = unicodedata.combining(chr(C))
+                if combining_class == 0 or combining_class == last_class:
+                    break
+                last_class = combining_class
+                # C is a non-starter that is not blocked from S
+                x, y, z = self.table.find_prefix(S + [C])
+                if z == "" and y is not None:
+                    lookup_key = lookup_key[:i] + lookup_key[i + 1:]
+                    value = y
+                    break # ???
+
             if not value:
                 # Calculate implicit weighting for CJK Ideographs
                 # http://www.unicode.org/reports/tr10/#Implicit_Weights
