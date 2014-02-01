@@ -28,9 +28,15 @@ class TrieTest(TestCase):
         self.assertEqual(t.find_prefix("food"), ("foo", "bar", "d"))
 
 
-class CombiningCharacterTest(TestCase):
+class FromFullTest(TestCase):
 
-    def test_combining_characters(self):
+    def test_1(self):
+        from pyuca import Collator
+        c = Collator()
+
+        self.assertEqual(c.sort_key(u"\u0332\u0334"), (0x0000, 0x004A, 0x0021, 0x0000, 0x0002, 0x0002, 0x0000))
+
+    def test_2(self):
         from pyuca import Collator
         c = Collator()
 
