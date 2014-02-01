@@ -50,10 +50,10 @@ class Collator:
                         coll_elements.append(hexstrings2int(weights))
                     self.table.add(char_list, coll_elements)
 
-    def collation_elements(self, string):
+    def collation_elements(self, normalized_string):
         collation_elements = []
 
-        lookup_key = [ord(ch) for ch in string]
+        lookup_key = [ord(ch) for ch in normalized_string]
         while lookup_key:
             S, value, lookup_key = self.table.find_prefix(lookup_key)
 
@@ -100,6 +100,6 @@ class Collator:
         return tuple(sort_key)
 
     def sort_key(self, string):
-
-        collation_elements = self.collation_elements(string)
+        normalized_string = unicodedata.normalize("NFD", string)
+        collation_elements = self.collation_elements(normalized_string)
         return self.sort_key_from_collation_elements(collation_elements)
