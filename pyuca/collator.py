@@ -5,11 +5,6 @@ import unicodedata
 from .trie import Trie
 from .utils import hexstrings2int
 
-try:
-    unichr
-except NameError:
-    unichr = chr
-
 
 COLL_ELEMENT_PATTERN = re.compile(r"""
     \[
@@ -66,7 +61,7 @@ class Collator:
 
             last_class = None
             for i, C in enumerate(lookup_key):
-                combining_class = unicodedata.combining(unichr(C))
+                combining_class = unicodedata.combining(chr(C))
                 if combining_class == 0 or combining_class == last_class:
                     break
                 last_class = combining_class

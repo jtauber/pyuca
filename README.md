@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/jtauber/pyuca.png?branch=master)](https://travis-ci.org/jtauber/pyuca)
 [![Coverage Status](https://coveralls.io/repos/jtauber/pyuca/badge.png?branch=master)](https://coveralls.io/r/jtauber/pyuca?branch=master)
 
-This is a Python 2.7/3.3 implementation of the
+This is a Python 3 implementation of the
 [Unicode Collation Algorithm (UCA)](http://unicode.org/reports/tr10/). It
 passes 100% of the UCA conformances tests for Unicode 6.3.0 with a
 variable-weighting setting of Non-ignorable.
