@@ -19,14 +19,28 @@ COLL_ELEMENT_PATTERN = re.compile(r"""
 """, re.X)
 
 
+DEFAULT_SETTINGS = {
+    "strength": "tertiary",
+    "alternate": "non-ignorable",
+    "backwards": "off",
+    "normalization": "on",
+}
+
 class Collator:
 
-    def __init__(self, filename=None):
+    def __init__(self, ce_table_filename=None, settings={}):
 
-        if filename is None:
-            filename = os.path.join(os.path.dirname(__file__), "allkeys.txt")
+        if ce_table_filename is None:
+            ce_table_filename = os.path.join(
+                os.path.dirname(__file__),
+                "allkeys.txt"
+            )
+
+        self.settings = DEFAULT_SETTINGS
+        self.settings.update(settings)
+
         self.table = Trie()
-        self.load(filename)
+        self.load(ce_table_filename)
 
     def load(self, filename):
         with open(filename) as keys_file:
