@@ -73,6 +73,57 @@ class TrieTest(TestCase):
         self.assertEqual(self.t.find_prefix("abdc"), ("a", "yes", "bdc"))
 
 
+class StrengthTest(TestCase):
+
+    def setUp(self):
+        from pyuca import Collator
+        self.default = Collator()
+        self.secondary = Collator(strength="secondary")
+        self.primary = Collator(strength="primary")
+
+    def test_1(self):
+        self.assertNotEqual(
+            self.default.sort_key("ß"),
+            self.default.sort_key("ss")
+        )
+        self.assertNotEqual(
+            self.secondary.sort_key("ß"),
+            self.secondary.sort_key("ss")
+        )
+        self.assertEqual(
+            self.primary.sort_key("ß"),
+            self.primary.sort_key("ss")
+        )
+
+    def test_2(self):
+        self.assertNotEqual(
+            self.default.sort_key("A"),
+            self.default.sort_key("a")
+        )
+        self.assertEqual(
+            self.secondary.sort_key("A"),
+            self.secondary.sort_key("a")
+        )
+        self.assertEqual(
+            self.primary.sort_key("A"),
+            self.primary.sort_key("a")
+        )
+
+    def test_3(self):
+        self.assertNotEqual(
+            self.default.sort_key("a"),
+            self.default.sort_key("á")
+        )
+        self.assertNotEqual(
+            self.secondary.sort_key("a"),
+            self.secondary.sort_key("á")
+        )
+        self.assertEqual(
+            self.primary.sort_key("a"),
+            self.primary.sort_key("á")
+        )
+
+
 class FromFullTest(TestCase):
 
     def setUp(self):
@@ -82,34 +133,34 @@ class FromFullTest(TestCase):
     def test_1(self):
         self.assertEqual(
             self.c.sort_key("\u0332\u0334"),
-            (0x0000, 0x004A, 0x0021, 0x0000, 0x0002, 0x0002, 0x0000)
+            (0x0000, 0x004A, 0x0021, 0x0000, 0x0002, 0x0002)
         )
 
     def test_2(self):
         self.assertEqual(
             self.c.sort_key("\u0430\u0306\u0334"),
-            (0x1991, 0x0000, 0x0020, 0x004A, 0x0000, 0x0002, 0x0002, 0x0000)
+            (0x1991, 0x0000, 0x0020, 0x004A, 0x0000, 0x0002, 0x0002)
         )
 
     def test_3(self):
         self.assertEqual(
             self.c.sort_key("\u0FB2\u0F71\u0001\u0F80\u0061"),
             (0x2571, 0x2587, 0x258A, 0x15EB, 0x0000, 0x0020, 0x0020, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0002, 0x0002, 0x0000)
+                0x0020, 0x0000, 0x0002, 0x0002, 0x0002, 0x0002)
         )
 
     def test_4(self):
         self.assertEqual(
             self.c.sort_key("\u4E00\u0021"),
             (0xFB40, 0xCE00, 0x025D, 0x0000, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
+                0x0020, 0x0000, 0x0002, 0x0002)
         )
 
     def test_5(self):
         self.assertEqual(
             self.c.sort_key("\u3400\u0021"),
             (0xFB80, 0xB400, 0x025D, 0x0000, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
+                0x0020, 0x0000, 0x0002, 0x0002)
         )
 
 

@@ -19,16 +19,9 @@ COLL_ELEMENT_PATTERN = re.compile(r"""
 """, re.X)
 
 
-DEFAULT_SETTINGS = {
-    "strength": "tertiary",
-    "alternate": "non-ignorable",
-    "backwards": "off",
-    "normalization": "on",
-}
-
 class Collator:
 
-    def __init__(self, ce_table_filename=None, settings={}):
+    def __init__(self, ce_table_filename=None, **custom_settings):
 
         if ce_table_filename is None:
             ce_table_filename = os.path.join(
@@ -36,8 +29,21 @@ class Collator:
                 "allkeys.txt"
             )
 
-        self.settings = DEFAULT_SETTINGS
-        self.settings.update(settings)
+        settings = {
+            "strength": "tertiary",
+            "alternate": "non-ignorable",
+            "backwards": "off",
+            "normalization": "on",
+        }
+        settings.update(custom_settings)
+
+        self.max_level = {
+            "primary": 1,
+            "secondary": 2,
+            "tertiary": 3,
+            "quaternary": 4,
+            "identical": 5
+        }[settings["strength"]]
 
         self.table = Trie()
         self.load(ce_table_filename)
@@ -113,7 +119,7 @@ class Collator:
     def sort_key_from_collation_elements(self, collation_elements):
         sort_key = []
 
-        for level in range(4):
+        for level in range(self.max_level):
             if level:
                 sort_key.append(0)  # level separator
             for element in collation_elements:
