@@ -45,6 +45,11 @@ class Collator:
             "identical": 5
         }[settings["strength"]]
 
+        self.normalization = {
+            "on": True,
+            "off": False,
+        }[settings["normalization"]]
+
         self.table = Trie()
         self.load(ce_table_filename)
 
@@ -131,6 +136,9 @@ class Collator:
         return tuple(sort_key)
 
     def sort_key(self, string):
-        normalized_string = unicodedata.normalize("NFD", string)
+        if self.normalization:
+            normalized_string = unicodedata.normalize("NFD", string)
+        else:
+            normalized_string = string
         collation_elements = self.collation_elements(normalized_string)
         return self.sort_key_from_collation_elements(collation_elements)
