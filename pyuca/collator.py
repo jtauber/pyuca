@@ -37,11 +37,25 @@ class BaseCollator(object):
     CJK_IDEOGRAPHS_EXT_E = False  # 8.0
     CJK_IDEOGRAPHS_EXT_F = False  # 10.0
 
-    def __init__(self, ce_table_filename=None):
+    def __init__(self, ce_table_filename=None, **custom_settings):
         if ce_table_filename is None:
             ce_table_filename = os.path.join(
                 os.path.dirname(__file__),
                 "allkeys-{0}.txt".format(self.UCA_VERSION))
+
+        settings = {
+            "strength": "tertiary",
+            "alternate": "non-ignorable",
+            "backwards": "off",
+            "normalization": "on",
+        }
+        settings.update(custom_settings)
+
+        self.normalization = {
+            "on": True,
+            "off": False,
+        }[settings["normalization"]]
+
         self.table = Trie()
         self.implicit_weights = []
         self.load(ce_table_filename)
@@ -116,7 +130,10 @@ class BaseCollator(object):
         return tuple(sort_key)
 
     def sort_key(self, string):
-        normalized_string = unicodedata.normalize("NFD", string)
+        if self.normalization:
+            normalized_string = unicodedata.normalize("NFD", string)
+        else:
+            normalized_string = string
         collation_elements = self.collation_elements(normalized_string)
         return self.sort_key_from_collation_elements(collation_elements)
 

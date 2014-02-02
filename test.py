@@ -82,6 +82,37 @@ class TrieTest(unittest.TestCase):
         self.assertEqual(self.t.find_prefix("abdc"), ("a", "yes", "bdc"))
 
 
+class NormalizationTest(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+        """
+        initialize default collator
+
+        It relies on "Strong Normalization Stability", applicable in
+        Unicode version 4.1+
+        https://www.unicode.org/policies/stability_policy.html#Normalization
+        """
+        from pyuca import Collator
+        super(NormalizationTest, self).__init__(*args, **kwargs)
+        self.default = Collator()
+        self.norm_on = Collator(normalization="on")
+        self.norm_off = Collator(normalization="off")
+
+    def test_1(self):
+        s = "\u0332\u0334"
+        self.assertEqual(
+            self.default.sort_key(s),
+            self.norm_on.sort_key(s)
+        )
+
+    def test_2(self):
+        s = "\u0332\u0334"
+        self.assertNotEqual(
+            self.norm_on.sort_key(s),
+            self.norm_off.sort_key(s)
+        )
+
+
 class FromFullTest(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
