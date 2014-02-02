@@ -51,6 +51,14 @@ class BaseCollator(object):
         }
         settings.update(custom_settings)
 
+        self.max_level = {
+            "primary": 1,
+            "secondary": 2,
+            "tertiary": 3,
+            "quaternary": 4,
+            "identical": 5
+        }[settings["strength"]]
+
         self.normalization = {
             "on": True,
             "off": False,
@@ -118,7 +126,7 @@ class BaseCollator(object):
     def sort_key_from_collation_elements(self, collation_elements):
         sort_key = []
 
-        for level in range(4):
+        for level in range(self.max_level):
             if level:
                 sort_key.append(0)  # level separator
             for element in collation_elements:

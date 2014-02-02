@@ -16,6 +16,7 @@ Unicode 6.3.0 (Python 3.3+), Unicode 8.0.0 (Python 3.5+), Unicode 9.0.0
 setting of Non-ignorable.
 
 
+
 ## What do you use it for?
 
 In short, sorting non-English strings properly.
@@ -71,7 +72,13 @@ version of Python.
 
 ### strength
 
-Not yet implemented.
+Takes the values ``primary``, ``secondary``, ``tertiary``, ``quaternary`` and
+``identical`` and defaults to ``tertiary``.
+
+Only considers levels up to the one given. For example, a value of ``primary``
+will consider ``a`` and ``á`` the same (assuming the default collation element
+table) and a value of ``secondary`` (or ``primary``) will consider ``a`` and
+``A`` the same (again, assuming the default collation element table).
 
 ### alternate
 
