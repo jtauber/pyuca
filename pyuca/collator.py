@@ -50,6 +50,11 @@ class Collator:
             "off": False,
         }[settings["normalization"]]
 
+        self.backwards_levels = {
+            "on": [1],
+            "off": [],
+        }[settings["backwards"]]
+
         self.table = Trie()
         self.load(ce_table_filename)
 
@@ -127,11 +132,15 @@ class Collator:
         for level in range(self.max_level):
             if level:
                 sort_key.append(0)  # level separator
+            new_keys = []
             for element in collation_elements:
                 if len(element) > level:
                     ce_l = element[level]
                     if ce_l:
-                        sort_key.append(ce_l)
+                        new_keys.append(ce_l)
+            if level in self.backwards_levels:
+                new_keys.reverse()
+            sort_key.extend(new_keys)
 
         return tuple(sort_key)
 
