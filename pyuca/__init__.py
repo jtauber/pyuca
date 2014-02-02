@@ -1,9 +1,8 @@
 """
-Preliminary implementation of the Unicode Collation Algorithm.
+This is a Python 3 implementation of the Unicode Collation Algorithm (UCA)
 
-This only implements the simple parts of the algorithm but I have successfully
-tested it using the Default Unicode Collation Element Table (DUCET) to collate
-Ancient Greek correctly.
+It passes 100% of the UCA conformances tests for Unicode 6.3.0 with a
+variable-weighting setting of Non-ignorable.
 
 Usage example:
 

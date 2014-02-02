@@ -39,8 +39,8 @@ Usage example:
 
     sorted_words = sorted(words, key=c.sort_key)
 
-``Collator`` takes an optional filename if you need to tailor the collation
-for your specific language usage.
+``Collator`` can also take an optional filename for specifying a custom
+collation element table.
 
 ## License
 
