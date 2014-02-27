@@ -1,7 +1,7 @@
 # pyuca: Python Unicode Collation Algorithm implementation
 
-[![Build Status](https://travis-ci.org/jtauber/pyuca.png?branch=master)](https://travis-ci.org/jtauber/pyuca)
-[![Coverage Status](https://coveralls.io/repos/jtauber/pyuca/badge.png?branch=master)](https://coveralls.io/r/jtauber/pyuca?branch=master)
+[![Build Status](http://img.shields.io/travis/jtauber/pyuca.svg)](https://travis-ci.org/jtauber/pyuca)
+[![Coverage Status](http://img.shields.io/coveralls/jtauber/pyuca.svg)](https://coveralls.io/r/jtauber/pyuca?branch=master)
 
 This is a Python 3 implementation of the
 [Unicode Collation Algorithm (UCA)](http://unicode.org/reports/tr10/). It
