@@ -2,6 +2,7 @@
 
 [![Build Status](http://img.shields.io/travis/jtauber/pyuca.svg)](https://travis-ci.org/jtauber/pyuca)
 [![Coverage Status](http://img.shields.io/coveralls/jtauber/pyuca.svg)](https://coveralls.io/r/jtauber/pyuca?branch=master)
+![MIT License](http://img.shields.io/badge/license-MIT-brightgreen.svg)
 
 This is a Python 3 implementation of the
 [Unicode Collation Algorithm (UCA)](http://unicode.org/reports/tr10/). It
