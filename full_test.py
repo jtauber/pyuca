@@ -1,4 +1,7 @@
+from __future__ import unicode_literals, print_function
+
 import sys
+from io import open
 
 from pyuca import Collator
 from pyuca.utils import format_sort_key

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 """
 utilities for formatting the datastructures used in pyuca.
 

@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 import os.path
 import re
 import unicodedata
+from io import open
 
 from .trie import Trie
 from .utils import hexstrings2int
@@ -61,7 +64,7 @@ class Collator:
 
             last_class = None
             for i, C in enumerate(lookup_key):
-                combining_class = unicodedata.combining(chr(C))
+                combining_class = unicodedata.combining(unichr(C))
                 if combining_class == 0 or combining_class == last_class:
                     break
                 last_class = combining_class
