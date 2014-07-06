@@ -9,6 +9,7 @@ This is a Python 3 implementation of the
 passes 100% of the UCA conformances tests for Unicode 6.3.0 with a
 variable-weighting setting of Non-ignorable.
 
+
 ## What do you use it for?
 
 In short, sorting non-English strings properly.
@@ -27,6 +28,7 @@ beginnings with ``c``. **Expansion** is where a single letter is treated as
 though it were multiple letters. In German, ``ä`` is sorted as if it were
 ``ae``, i.e. after ``ad`` but before ``af``.
 
+
 ## How to use it
 
 Here is how to use the ``pyuca`` module.
@@ -41,7 +43,47 @@ Usage example:
     sorted_words = sorted(words, key=c.sort_key)
 
 ``Collator`` can also take an optional filename for specifying a custom
-collation element table.
+collation element table as well as some keyword arguments to override the
+default behavior.
+
+
+## Settings
+
+``Collator`` can take zero or more of the following as keyword arguments:
+
+* ``strength``
+* ``alternate``
+* ``backwards``
+* ``normalization``
+
+### strength
+
+Takes the values ``primary``, ``secondary``, ``tertiary``, ``quaternary`` and
+``identical`` and defaults to ``tertiary``.
+
+Only considers levels up to the one given. For example, a value of ``primary``
+will consider ``a`` and ``á`` the same (assuming the default collation element
+table) and a value of ``secondary`` (or ``primary``) will consider ``a`` and
+``A`` the same (again, assuming the default collation element table).
+
+### alternate
+
+Not yet implemented (defaults to ``non-ignorable``).
+
+### backwards
+
+Takes the values ``on`` and ``off``, and defaults to ``off``.
+
+If ``on``, accents are considered from the end of the word, backwards.
+
+### normalization
+
+Takes the values ``on`` and ``off``, and defaults to ``on``.
+
+If ``on``, the strings to be collated are first normalized to NFD. If your
+strings are known to already be in NFD, you can set ``normalization`` to
+``off`` for better performance.
+
 
 ## License
 
