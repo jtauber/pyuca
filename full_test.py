@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, print_function
+from __future__ import unicode_literals
 
 import sys
 from io import open
@@ -6,6 +6,10 @@ from io import open
 from pyuca import Collator
 from pyuca.utils import format_sort_key
 
+try:
+    chr = unichr
+except NameError:
+    pass
 
 c = Collator()
 
