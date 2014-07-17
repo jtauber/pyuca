@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
 """
 utilities for formatting the datastructures used in pyuca.
 
 Useful mostly for debugging output.
 """
+from __future__ import unicode_literals
 
 
 def hexstrings2int(hexstrings):
