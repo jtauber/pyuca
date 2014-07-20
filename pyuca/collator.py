@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os.path
 import re
+import sys
 import unicodedata
 from io import open
 
@@ -13,6 +14,10 @@ try:
 except NameError:
     pass
 
+if sys.version_info < (3,):
+    UCA_VERSION = '5.2.0'
+else:
+    UCA_VERSION = '6.3.0'
 
 COLL_ELEMENT_PATTERN = re.compile(r"""
     \[
@@ -32,14 +37,16 @@ class Collator:
     def __init__(self, filename=None):
 
         if filename is None:
-            filename = os.path.join(os.path.dirname(__file__), "allkeys.txt")
+            filename = os.path.join(
+                os.path.dirname(__file__),
+                "allkeys-{0}.txt".format(UCA_VERSION))
         self.table = Trie()
         self.load(filename)
 
     def load(self, filename):
         with open(filename) as keys_file:
             for line in keys_file:
-                line = line.split("#")[0].split("%")[0].strip()
+                line = line.split("#", 1)[0].rstrip()
 
                 if not line:
                     continue
@@ -47,7 +54,7 @@ class Collator:
                 if line.startswith("@version"):
                     pass
                 else:
-                    a, b = line.split(";")
+                    a, b = line.split(";", 1)
                     char_list = hexstrings2int(a.split())
                     coll_elements = []
                     for x in COLL_ELEMENT_PATTERN.finditer(b.strip()):
@@ -101,6 +108,8 @@ class Collator:
                 value = [[AAAA, 0x0020, 0x002], [BBBB, 0x0000, 0x0000]]
 
             collation_elements.extend(value)
+        print '?'
+        print collation_elements
 
         return collation_elements
 
