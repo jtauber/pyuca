@@ -9,7 +9,7 @@ setup(
     author="James Tauber",
     author_email="jtauber@jtauber.com",
     packages=["pyuca"],
-    package_data={"": ["allkeys.txt"]},
+    package_data={"": ["allkeys-5.2.0.txt", "allkeys-6.3.0.txt"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
