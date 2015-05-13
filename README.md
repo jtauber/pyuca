@@ -4,7 +4,7 @@
 [![Coverage Status](http://img.shields.io/coveralls/jtauber/pyuca.svg)](https://coveralls.io/r/jtauber/pyuca?branch=master)
 ![MIT License](http://img.shields.io/badge/license-MIT-brightgreen.svg)
 
-This is a Python 3 implementation of the
+This is a Python implementation of the
 [Unicode Collation Algorithm (UCA)](http://unicode.org/reports/tr10/). It
 passes 100% of the UCA conformances tests for Unicode 6.3.0 with a
 variable-weighting setting of Non-ignorable.

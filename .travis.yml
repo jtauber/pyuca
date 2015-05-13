@@ -1,5 +1,6 @@
 language: python
 python:
+  - "2.7"
   - "3.3"
   - "3.4"
 install:
@@ -12,3 +13,4 @@ script:
   - coverage run --append --branch --source pyuca full_test.py
 after_success:
   - coveralls
+sudo: false
