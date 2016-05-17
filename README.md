@@ -6,8 +6,8 @@
 
 This is a Python implementation of the
 [Unicode Collation Algorithm (UCA)](http://unicode.org/reports/tr10/). It
-passes 100% of the UCA conformances tests for Unicode 6.3.0 with a
-variable-weighting setting of Non-ignorable.
+passes 100% of the UCA conformance tests for Unicode 5.2.0 (Python 2.7) and
+Unicode 6.3.0 (Python 3.3+) with a variable-weighting setting of Non-ignorable.
 
 ## What do you use it for?
 
