@@ -56,3 +56,11 @@ collation element table.
 Python code is made available under an MIT license (see `LICENSE`).
 `allkeys.txt` is made available under the similar license defined in
 `LICENSE-allkeys`.
+
+## Contacting the Developer
+
+If you have any problems, questions or suggestions, it's best to file an issue
+on GitHub although you can also contact me at jtauber@jtauber.com.
+
+For more of my work on linguistics and Ancient Greek, see
+<http://jktauber.com/>.
