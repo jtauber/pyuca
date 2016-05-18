@@ -39,14 +39,8 @@ Usage example:
     from pyuca import Collator
     c = Collator()
 
-    self.assertEqual(
-        sorted(["cafe", "caff", "café"]),
-        ["cafe", "caff", "café"]
-    )
-    self.assertEqual(
-        sorted(["cafe", "caff", "café"], key=c.sort_key),
-        ["cafe", "café", "caff"]
-    )
+    assert sorted(["cafe", "caff", "café"]) == ["cafe", "caff", "café"]
+    assert sorted(["cafe", "caff", "café"], key=c.sort_key) == ["cafe", "café", "caff"]
 
 ``Collator`` can also take an optional filename for specifying a custom
 collation element table.
