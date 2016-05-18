@@ -39,7 +39,14 @@ Usage example:
     from pyuca import Collator
     c = Collator()
 
-    sorted_words = sorted(words, key=c.sort_key)
+    self.assertEqual(
+        sorted(["cafe", "caff", "café"]),
+        ["cafe", "caff", "café"]
+    )
+    self.assertEqual(
+        sorted(["cafe", "caff", "café"], key=c.sort_key),
+        ["cafe", "café", "caff"]
+    )
 
 ``Collator`` can also take an optional filename for specifying a custom
 collation element table.
