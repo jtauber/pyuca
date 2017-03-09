@@ -48,6 +48,10 @@ Usage example:
 ``Collator`` can also take an optional filename for specifying a custom
 collation element table.
 
+## How to cite it
+
+Tauber, J. K. (2016). pyuca: a Python implementation of the Unicode Collation Algorithm. The Journal of Open Source Software. DOI: 10.21105/joss.00021
+
 ## License
 
 Python code is made available under an MIT license (see `LICENSE`).
