@@ -98,6 +98,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
     @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_2(self):
         self.assertEqual(
@@ -106,6 +107,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
     @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_3(self):
         self.assertEqual(
@@ -115,6 +117,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
     @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_4(self):
         self.assertEqual(
@@ -124,6 +127,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
     @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_5(self):
         self.assertEqual(
