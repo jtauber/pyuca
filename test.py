@@ -230,6 +230,14 @@ class FromFullTestV10_0_0(unittest.TestCase):
             "| 004A 0033 | 0002 0002 |",
         )
 
+    @unittest.skipIf(not V10_0_0, "only matches UCA version 10.0.0")
+    def test_2(self):
+        from pyuca.utils import format_sort_key
+        self.assertEqual(
+            format_sort_key(self.c.sort_key("\u9FEA\u0062")),
+            "FB41 9FEA 1CC6 | 0020 0020 | 0002 0002 |",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

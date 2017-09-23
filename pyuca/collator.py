@@ -29,6 +29,7 @@ COLL_ELEMENT_PATTERN = re.compile(r"""
 
 class BaseCollator(object):
     CJK_IDEOGRAPHS_8_0_0 = False
+    CJK_IDEOGRAPHS_10_0_0 = False
     CJK_IDEOGRAPHS_EXT_A = True  # 3.0
     CJK_IDEOGRAPHS_EXT_B = True  # 3.1
     CJK_IDEOGRAPHS_EXT_C = True  # 5.2 (supposedly)
@@ -123,6 +124,7 @@ class BaseCollator(object):
         if (
             0x4E00 <= cp <= 0x9FCC or
             (self.CJK_IDEOGRAPHS_8_0_0 and 0x9FCD <= cp <= 0x9FD5) or
+            (self.CJK_IDEOGRAPHS_10_0_0 and 0x9FD6 <= cp <= 0x9FEA) or
             cp in [
                 0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F,
                 0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29,
@@ -181,6 +183,7 @@ class Collator_9_0_0(BaseCollator):
 class Collator_10_0_0(BaseCollator):
     UCA_VERSION = "10.0.0"
     CJK_IDEOGRAPHS_8_0_0 = True
+    CJK_IDEOGRAPHS_10_0_0 = True
     CJK_IDEOGRAPHS_EXT_E = True
     CJK_IDEOGRAPHS_EXT_F = True
 
