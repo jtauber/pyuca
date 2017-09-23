@@ -19,7 +19,7 @@ total_failures = 0
 
 for coll in [
     Collator_5_2_0, Collator_6_3_0,
-    Collator_8_0_0, Collator_9_0_0, Collator_10_0_0
+    Collator_8_0_0, Collator_9_0_0  # , Collator_10_0_0
 ]:
 
     c = coll()

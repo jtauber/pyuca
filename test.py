@@ -5,7 +5,8 @@ import sys
 import unittest
 
 PYTHON3 = sys.version_info >= (3,)
-
+V8_0_0 = True
+V10_0_0 = False
 
 class SmokeTest(unittest.TestCase):
 
@@ -162,6 +163,62 @@ class FromFullTest(unittest.TestCase):
             self.c.sort_key("\u3400\u0021"),
             (0xFB80, 0xB400, 0x026E, 0x0000, 0x0020,
                 0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
+        )
+
+
+class FromFullTestV8_0_0(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+        from pyuca.collator import Collator_8_0_0
+        super(FromFullTestV8_0_0, self).__init__(*args, **kwargs)
+        self.c = Collator_8_0_0()
+
+    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
+    def test_1(self):
+        from pyuca.utils import format_sort_key
+        self.assertEqual(
+            format_sort_key(self.c.sort_key("\u9FD5\u0062")),
+            "FB41 9FD5 1BDB | 0020 0020 | 0002 0002 |",
+        )
+
+    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
+    def test_2(self):
+        from pyuca.utils import format_sort_key
+        self.assertEqual(
+            format_sort_key(self.c.sort_key("\U0002CEA1\u0062")),
+            "FB85 CEA1 1BDB | 0020 0020 | 0002 0002 |",
+        )
+
+    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
+    def test_3(self):
+        from pyuca.utils import format_sort_key
+        self.assertEqual(
+            format_sort_key(self.c.sort_key("\U0002B81E\u0062")),
+            "FBC5 B81E 1BDB | 0020 0020 | 0002 0002 |",
+        )
+
+    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
+    def test_3(self):
+        from pyuca.utils import format_sort_key
+        self.assertEqual(
+            format_sort_key(self.c.sort_key("\U0002CEA2\u0021")),
+            "FBC5 CEA2 025F | 0020 0020 | 0002 0002 |",
+        )
+
+
+class FromFullTestV10_0_0(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+        from pyuca.collator import Collator_10_0_0
+        super(FromFullTestV10_0_0, self).__init__(*args, **kwargs)
+        self.c = Collator_10_0_0()
+
+    @unittest.skipIf(not V10_0_0, "only matches UCA version 10.0.0")
+    def test_1(self):
+        from pyuca.utils import format_sort_key
+        self.assertEqual(
+            format_sort_key(self.c.sort_key("\u1DF6\u0334")),
+            "| 004A 0033 | 0002 0002 |",
         )
 
 
