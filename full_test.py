@@ -15,6 +15,8 @@ except NameError:
     pass
 
 
+total_failures = 0
+
 for coll in [Collator_5_2_0, Collator_6_3_0, Collator_8_0_0, Collator_9_0_0, Collator_10_0_0]:
 
     c = coll()
@@ -54,5 +56,7 @@ for coll in [Collator_5_2_0, Collator_6_3_0, Collator_8_0_0, Collator_9_0_0, Col
     print("{0} success; {1} failure (UCA version {2})".format(
         success, failure, c.UCA_VERSION))
 
-    if failure > 0:
-        sys.exit(1)
+    total_failures += failure
+
+if total_failures > 0:
+    sys.exit(1)
