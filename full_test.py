@@ -17,7 +17,10 @@ except NameError:
 
 total_failures = 0
 
-for coll in [Collator_5_2_0, Collator_6_3_0, Collator_8_0_0, Collator_9_0_0, Collator_10_0_0]:
+for coll in [
+    Collator_5_2_0, Collator_6_3_0,
+    Collator_8_0_0, Collator_9_0_0, Collator_10_0_0
+]:
 
     c = coll()
 
@@ -44,7 +47,8 @@ for coll in [Collator_5_2_0, Collator_6_3_0, Collator_8_0_0, Collator_9_0_0, Col
                         print("-------")
                         print("failed on line {0}:".format(i+1))
                         print(line.rstrip("\n"))
-                        print("PREV: {0}".format(format_sort_key(prev_sort_key)))
+                        print("PREV: {0}".format(
+                            format_sort_key(prev_sort_key)))
                         print("THIS: {0}".format(
                             format_sort_key(test_string_sort_key)))
                         print("-------")
