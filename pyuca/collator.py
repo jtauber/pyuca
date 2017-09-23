@@ -127,6 +127,18 @@ class Collator_6_3_0(BaseCollator):
     UCA_VERSION = '6.3.0'
 
 
+class Collator_8_0_0(BaseCollator):
+    UCA_VERSION = "8.0.0"
+
+
+class Collator_9_0_0(BaseCollator):
+    UCA_VERSION = "9.0.0"
+
+
+class Collator_10_0_0(BaseCollator):
+    UCA_VERSION = "10.0.0"
+
+
 class Collator_5_2_0(BaseCollator):
     UCA_VERSION = '5.2.0'
     # Supposedly, extension C *was* introduced in 5.2.0, but the tests show
