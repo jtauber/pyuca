@@ -163,7 +163,7 @@ class BaseCollator(object):
 
 
 class Collator_6_3_0(BaseCollator):
-    UCA_VERSION = '6.3.0'
+    UCA_VERSION = "6.3.0"
 
 
 class Collator_8_0_0(BaseCollator):
@@ -186,7 +186,7 @@ class Collator_10_0_0(BaseCollator):
 
 
 class Collator_5_2_0(BaseCollator):
-    UCA_VERSION = '5.2.0'
+    UCA_VERSION = "5.2.0"
     # Supposedly, extension C *was* introduced in 5.2.0, but the tests show
     # otherwise. Treat the tests as king.
     CJK_IDEOGRAPHS_EXT_C = False
@@ -202,9 +202,9 @@ class Collator_5_2_0(BaseCollator):
 
     def _valid_char(self, ch):
         category = unicodedata.category(ch)
-        if category == 'Cs':
+        if category == "Cs":
             return False
-        if category != 'Cn':
+        if category != "Cn":
             return True
         return ord(ch) not in self.non_char_code_points
 
