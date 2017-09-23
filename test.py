@@ -8,6 +8,7 @@ PYTHON3 = sys.version_info >= (3,)
 V8_0_0 = sys.version_info >= (3, 5)
 V10_0_0 = sys.version_info >= (3, 7)
 
+
 class SmokeTest(unittest.TestCase):
 
     def test_cafe(self):
@@ -202,7 +203,7 @@ class FromFullTestV8_0_0(unittest.TestCase):
         )
 
     @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
-    def test_3(self):
+    def test_4(self):
         from pyuca.utils import format_sort_key
         self.assertEqual(
             format_sort_key(self.c.sort_key("\U0002CEA2\u0021")),

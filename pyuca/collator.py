@@ -184,6 +184,7 @@ class Collator_10_0_0(BaseCollator):
     CJK_IDEOGRAPHS_EXT_E = True
     CJK_IDEOGRAPHS_EXT_F = True
 
+
 class Collator_5_2_0(BaseCollator):
     UCA_VERSION = '5.2.0'
     # Supposedly, extension C *was* introduced in 5.2.0, but the tests show
