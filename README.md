@@ -48,6 +48,8 @@ Usage example:
 ``Collator`` can also take an optional filename for specifying a custom
 collation element table.
 
+You can also import collators for specific Unicode versions, e.g. `from pyuca.collator import Collator_8_0_0`. But just `from pyuca import Collator` will ensure that the collator version matches the version of `unicodata` provided by the standard library for your version of Python.
+
 ## How to cite it
 
 Tauber, J. K. (2016). pyuca: a Python implementation of the Unicode Collation Algorithm. The Journal of Open Source Software. DOI: 10.21105/joss.00021

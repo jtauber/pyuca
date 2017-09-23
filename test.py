@@ -5,8 +5,8 @@ import sys
 import unittest
 
 PYTHON3 = sys.version_info >= (3,)
-V8_0_0 = True
-V10_0_0 = False
+V8_0_0 = sys.version_info >= (3, 5)
+V10_0_0 = sys.version_info >= (3, 7)
 
 class SmokeTest(unittest.TestCase):
 
@@ -97,6 +97,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_2(self):
         self.assertEqual(
             self.c.sort_key("\u0430\u0306\u0334"),
@@ -104,6 +105,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_3(self):
         self.assertEqual(
             self.c.sort_key("\u0FB2\u0F71\u0001\u0F80\u0061"),
@@ -112,6 +114,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_4(self):
         self.assertEqual(
             self.c.sort_key("\u4E00\u0021"),
@@ -120,6 +123,7 @@ class FromFullTest(unittest.TestCase):
         )
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
+    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
     def test_5(self):
         self.assertEqual(
             self.c.sort_key("\u3400\u0021"),

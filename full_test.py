@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 import sys
 from io import open
 
+from pyuca import Collator
+
 from pyuca.collator import (
     Collator_5_2_0, Collator_6_3_0,
     Collator_8_0_0, Collator_9_0_0, Collator_10_0_0
@@ -14,13 +16,25 @@ try:
 except NameError:
     pass
 
+PYTHON3 = sys.version_info >= (3,)
+V8_0_0 = sys.version_info >= (3, 5)
+V9_0_0 = sys.version_info >= (3, 6)
+V10_0_0 = sys.version_info >= (3, 7)
+
+collators = [Collator, Collator_5_2_0]
+if PYTHON3:
+    collators.append(Collator_6_3_0)
+if V8_0_0:
+    collators.append(Collator_8_0_0)
+if V9_0_0:
+    collators.append(Collator_9_0_0)
+if V10_0_0:
+    collators.append(Collator_10_0_0)
+
 
 total_failures = 0
 
-for coll in [
-    Collator_5_2_0, Collator_6_3_0,
-    Collator_8_0_0, Collator_9_0_0  # , Collator_10_0_0
-]:
+for coll in collators:
 
     c = coll()
 

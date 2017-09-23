@@ -213,5 +213,9 @@ class Collator_5_2_0(BaseCollator):
 
 if sys.version_info < (3,):
     Collator = Collator_5_2_0
+elif sys.version_info[:2] == (3, 5):
+    Collator = Collator_8_0_0
+elif sys.version_info[:2] >= (3, 6):
+    Collator = Collator_9_0_0
 else:
     Collator = Collator_6_3_0
