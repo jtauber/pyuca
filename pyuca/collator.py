@@ -46,6 +46,9 @@ class BaseCollator(object):
                 if not line or line.startswith("@version"):
                     continue
 
+                if line.startswith("@implicitweights"):
+                    continue  # @@@ for now
+
                 a, b = line.split(";", 1)
                 char_list = hexstrings2int(a.split())
                 coll_elements = []
