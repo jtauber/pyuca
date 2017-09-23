@@ -39,13 +39,13 @@ for coll in [Collator_5_2_0, Collator_6_3_0, Collator_8_0_0, Collator_9_0_0, Col
                 if prev_sort_key:
                     if prev_sort_key > test_string_sort_key:
                         failure += 1
-                        print('-------')
+                        print("-------")
                         print("failed on line {0}:".format(i+1))
-                        print(line.rstrip('\n'))
+                        print(line.rstrip("\n"))
                         print("PREV: {0}".format(format_sort_key(prev_sort_key)))
                         print("THIS: {0}".format(
                             format_sort_key(test_string_sort_key)))
-                        print('-------')
+                        print("-------")
                     else:
                         success += 1
                 prev_sort_key = test_string_sort_key
