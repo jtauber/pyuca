@@ -36,6 +36,7 @@ class BaseCollator(object):
                 os.path.dirname(__file__),
                 "allkeys-{0}.txt".format(self.UCA_VERSION))
         self.table = Trie()
+        self.implicit_weights = []
         self.load(filename)
 
     def load(self, filename):
@@ -47,7 +48,12 @@ class BaseCollator(object):
                     continue
 
                 if line.startswith("@implicitweights"):
-                    continue  # @@@ for now
+                    ch_range, base = line[len("@implicitweights"):].split(";")
+                    range_start, range_end = ch_range.split("..")
+                    self.implicit_weights.append([
+                        int(range_start, 16), int(range_end, 16), int(base, 16)
+                    ])
+                    continue
 
                 a, b = line.split(";", 1)
                 char_list = hexstrings2int(a.split())
@@ -112,14 +118,26 @@ class BaseCollator(object):
                 0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F,
                 0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29]:
             base = 0xFB40
+            aaaa = base + (cp >> 15)
+            bbbb = (cp & 0x7FFF) | 0x8000
         elif (0x3400 <= cp <= 0x4DB5 or 0x20000 <= cp <= 0x2A6D6 or
                 (self.CJK_IDEAGRAPHS_EXT_C and 0x2A700 <= cp <= 0x2B734) or
                 0x2B740 <= cp <= 0x2B81D):
             base = 0xFB80
+            aaaa = base + (cp >> 15)
+            bbbb = (cp & 0x7FFF) | 0x8000
         else:
-            base = 0xFBC0
-        aaaa = base + (cp >> 15)
-        bbbb = (cp & 0x7FFF) | 0x8000
+            aaaa = None
+            for (start, end, base) in self.implicit_weights:
+                if start <= cp <= end:
+                    aaaa = base
+                    bbbb = (cp - start) | 0x8000
+                    break
+            if aaaa is None:
+                base = 0xFBC0
+                aaaa = base + (cp >> 15)
+                bbbb = (cp & 0x7FFF) | 0x8000
+
         return [[aaaa, 0x0020, 0x002], [bbbb, 0x0000, 0x0000]]
 
     def build_lookup_key(self, text):
