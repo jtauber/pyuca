@@ -10,8 +10,10 @@
 
 This is a Python implementation of the
 [Unicode Collation Algorithm (UCA)](http://unicode.org/reports/tr10/). It
-passes 100% of the UCA conformance tests for Unicode 5.2.0 (Python 2.7) and
-Unicode 6.3.0 (Python 3.3+) with a variable-weighting setting of Non-ignorable.
+passes 100% of the UCA conformance tests for Unicode 5.2.0 (Python 2.7),
+Unicode 6.3.0 (Python 3.3+), Unicode 8.0.0 (Python 3.5+), Unicode 9.0.0
+(Python 3.6+), and Unicode 10.0.0 (Python 3.7+) with a variable-weighting
+setting of Non-ignorable.
 
 ## What do you use it for?
 
@@ -47,6 +49,12 @@ Usage example:
 
 ``Collator`` can also take an optional filename for specifying a custom
 collation element table.
+
+You can also import collators for specific Unicode versions,
+e.g. `from pyuca.collator import Collator_8_0_0`.
+But just `from pyuca import Collator` will ensure that the collator version
+matches the version of `unicodata` provided by the standard library for your
+version of Python.
 
 ## How to cite it
 

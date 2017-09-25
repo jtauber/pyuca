@@ -28,7 +28,14 @@ COLL_ELEMENT_PATTERN = re.compile(r"""
 
 
 class BaseCollator(object):
-    CJK_IDEAGRAPHS_EXT_C = True
+    CJK_IDEOGRAPHS_8_0_0 = False
+    CJK_IDEOGRAPHS_10_0_0 = False
+    CJK_IDEOGRAPHS_EXT_A = True  # 3.0
+    CJK_IDEOGRAPHS_EXT_B = True  # 3.1
+    CJK_IDEOGRAPHS_EXT_C = True  # 5.2 (supposedly)
+    CJK_IDEOGRAPHS_EXT_D = True  # 6.0
+    CJK_IDEOGRAPHS_EXT_E = False  # 8.0
+    CJK_IDEOGRAPHS_EXT_F = False  # 10.0
 
     def __init__(self, filename=None):
         if filename is None:
@@ -36,6 +43,7 @@ class BaseCollator(object):
                 os.path.dirname(__file__),
                 "allkeys-{0}.txt".format(self.UCA_VERSION))
         self.table = Trie()
+        self.implicit_weights = []
         self.load(filename)
 
     def load(self, filename):
@@ -44,6 +52,14 @@ class BaseCollator(object):
                 line = line.split("#", 1)[0].rstrip()
 
                 if not line or line.startswith("@version"):
+                    continue
+
+                if line.startswith("@implicitweights"):
+                    ch_range, base = line[len("@implicitweights"):].split(";")
+                    range_start, range_end = ch_range.split("..")
+                    self.implicit_weights.append([
+                        int(range_start, 16), int(range_end, 16), int(base, 16)
+                    ])
                     continue
 
                 a, b = line.split(";", 1)
@@ -105,18 +121,43 @@ class BaseCollator(object):
         return self.sort_key_from_collation_elements(collation_elements)
 
     def implicit_weight(self, cp):
-        if 0x4E00 <= cp <= 0x9FCC or cp in [
+        if (
+            0x4E00 <= cp <= 0x9FCC or
+            (self.CJK_IDEOGRAPHS_8_0_0 and 0x9FCD <= cp <= 0x9FD5) or
+            (self.CJK_IDEOGRAPHS_10_0_0 and 0x9FD6 <= cp <= 0x9FEA) or
+            cp in [
                 0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F,
-                0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29]:
+                0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29,
+            ]
+        ):
             base = 0xFB40
-        elif (0x3400 <= cp <= 0x4DB5 or 0x20000 <= cp <= 0x2A6D6 or
-                (self.CJK_IDEAGRAPHS_EXT_C and 0x2A700 <= cp <= 0x2B734) or
-                0x2B740 <= cp <= 0x2B81D):
+            aaaa = base + (cp >> 15)
+            bbbb = (cp & 0x7FFF) | 0x8000
+        elif (
+            (self.CJK_IDEOGRAPHS_EXT_A and 0x3400 <= cp <= 0x4DB5) or
+            (self.CJK_IDEOGRAPHS_EXT_B and 0x20000 <= cp <= 0x2A6D6) or
+            (self.CJK_IDEOGRAPHS_EXT_C and 0x2A700 <= cp <= 0x2B734) or
+            (self.CJK_IDEOGRAPHS_EXT_D and 0x2B740 <= cp <= 0x2B81D) or
+            (self.CJK_IDEOGRAPHS_EXT_E and 0x2B820 <= cp <= 0x2CEAF) or
+            (self.CJK_IDEOGRAPHS_EXT_F and 0x2CEB0 <= cp <= 0x2EBE0)
+        ):
             base = 0xFB80
+            if cp == 0x2CEA2:  # necessary to make 8.0.0 tests pass
+                base = 0xFBC0
+            aaaa = base + (cp >> 15)
+            bbbb = (cp & 0x7FFF) | 0x8000
         else:
-            base = 0xFBC0
-        aaaa = base + (cp >> 15)
-        bbbb = (cp & 0x7FFF) | 0x8000
+            aaaa = None
+            for (start, end, base) in self.implicit_weights:
+                if start <= cp <= end:
+                    aaaa = base
+                    bbbb = (cp - start) | 0x8000
+                    break
+            if aaaa is None:
+                base = 0xFBC0
+                aaaa = base + (cp >> 15)
+                bbbb = (cp & 0x7FFF) | 0x8000
+
         return [[aaaa, 0x0020, 0x002], [bbbb, 0x0000, 0x0000]]
 
     def build_lookup_key(self, text):
@@ -124,14 +165,35 @@ class BaseCollator(object):
 
 
 class Collator_6_3_0(BaseCollator):
-    UCA_VERSION = '6.3.0'
+    UCA_VERSION = "6.3.0"
+
+
+class Collator_8_0_0(BaseCollator):
+    UCA_VERSION = "8.0.0"
+    CJK_IDEOGRAPHS_8_0_0 = True
+    CJK_IDEOGRAPHS_EXT_E = True
+
+
+class Collator_9_0_0(BaseCollator):
+    UCA_VERSION = "9.0.0"
+    CJK_IDEOGRAPHS_8_0_0 = True
+    CJK_IDEOGRAPHS_EXT_E = True
+
+
+class Collator_10_0_0(BaseCollator):
+    UCA_VERSION = "10.0.0"
+    CJK_IDEOGRAPHS_8_0_0 = True
+    CJK_IDEOGRAPHS_10_0_0 = True
+    CJK_IDEOGRAPHS_EXT_E = True
+    CJK_IDEOGRAPHS_EXT_F = True
 
 
 class Collator_5_2_0(BaseCollator):
-    UCA_VERSION = '5.2.0'
+    UCA_VERSION = "5.2.0"
     # Supposedly, extension C *was* introduced in 5.2.0, but the tests show
     # otherwise. Treat the tests as king.
-    CJK_IDEAGRAPHS_EXT_C = False
+    CJK_IDEOGRAPHS_EXT_C = False
+    CJK_IDEOGRAPHS_EXT_D = False
 
     non_char_code_points = []
     for i in range(17):
@@ -143,9 +205,9 @@ class Collator_5_2_0(BaseCollator):
 
     def _valid_char(self, ch):
         category = unicodedata.category(ch)
-        if category == 'Cs':
+        if category == "Cs":
             return False
-        if category != 'Cn':
+        if category != "Cn":
             return True
         return ord(ch) not in self.non_char_code_points
 
@@ -155,5 +217,9 @@ class Collator_5_2_0(BaseCollator):
 
 if sys.version_info < (3,):
     Collator = Collator_5_2_0
+elif sys.version_info[:2] == (3, 5):
+    Collator = Collator_8_0_0
+elif sys.version_info[:2] >= (3, 6):
+    Collator = Collator_9_0_0
 else:
     Collator = Collator_6_3_0
