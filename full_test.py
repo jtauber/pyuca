@@ -21,7 +21,7 @@ V8_0_0 = sys.version_info >= (3, 5)
 V9_0_0 = sys.version_info >= (3, 6)
 V10_0_0 = sys.version_info >= (3, 7)
 
-collators = [Collator, Collator_5_2_0]
+collators = [Collator_5_2_0]
 if PYTHON3:
     collators.append(Collator_6_3_0)
 if V8_0_0:
@@ -30,6 +30,13 @@ if V9_0_0:
     collators.append(Collator_9_0_0)
 if V10_0_0:
     collators.append(Collator_10_0_0)
+
+default_collator = Collator
+
+collators = [
+    collator for collator in collators
+    if collator.UCA_VERSION != default_collator.UCA_VERSION
+] + [default_collator]
 
 
 total_failures = 0
