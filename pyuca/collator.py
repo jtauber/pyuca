@@ -122,28 +122,30 @@ class BaseCollator(object):
 
     def implicit_weight(self, cp):
         if (
-            0x4E00 <= cp <= 0x9FCC or
-            (self.CJK_IDEOGRAPHS_8_0_0 and 0x9FCD <= cp <= 0x9FD5) or
-            (self.CJK_IDEOGRAPHS_10_0_0 and 0x9FD6 <= cp <= 0x9FEA) or
-            cp in [
-                0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F,
-                0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29,
-            ]
+            (unicodedata.category(chr(cp)) != "Cn") and (
+                0x4E00 <= cp <= 0x9FCC or
+                (self.CJK_IDEOGRAPHS_8_0_0 and 0x9FCD <= cp <= 0x9FD5) or
+                (self.CJK_IDEOGRAPHS_10_0_0 and 0x9FD6 <= cp <= 0x9FEA) or
+                cp in [
+                    0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F,
+                    0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29,
+                ]
+            )
         ):
             base = 0xFB40
             aaaa = base + (cp >> 15)
             bbbb = (cp & 0x7FFF) | 0x8000
         elif (
-            (self.CJK_IDEOGRAPHS_EXT_A and 0x3400 <= cp <= 0x4DB5) or
-            (self.CJK_IDEOGRAPHS_EXT_B and 0x20000 <= cp <= 0x2A6D6) or
-            (self.CJK_IDEOGRAPHS_EXT_C and 0x2A700 <= cp <= 0x2B734) or
-            (self.CJK_IDEOGRAPHS_EXT_D and 0x2B740 <= cp <= 0x2B81D) or
-            (self.CJK_IDEOGRAPHS_EXT_E and 0x2B820 <= cp <= 0x2CEAF) or
-            (self.CJK_IDEOGRAPHS_EXT_F and 0x2CEB0 <= cp <= 0x2EBE0)
+            (unicodedata.category(chr(cp)) != "Cn") and (
+                (self.CJK_IDEOGRAPHS_EXT_A and 0x3400 <= cp <= 0x4DB5) or
+                (self.CJK_IDEOGRAPHS_EXT_B and 0x20000 <= cp <= 0x2A6D6) or
+                (self.CJK_IDEOGRAPHS_EXT_C and 0x2A700 <= cp <= 0x2B734) or
+                (self.CJK_IDEOGRAPHS_EXT_D and 0x2B740 <= cp <= 0x2B81D) or
+                (self.CJK_IDEOGRAPHS_EXT_E and 0x2B820 <= cp <= 0x2CEAF) or
+                (self.CJK_IDEOGRAPHS_EXT_F and 0x2CEB0 <= cp <= 0x2EBE0)
+            )
         ):
             base = 0xFB80
-            if cp == 0x2CEA2:  # necessary to make 8.0.0 tests pass
-                base = 0xFBC0
             aaaa = base + (cp >> 15)
             bbbb = (cp & 0x7FFF) | 0x8000
         else:
