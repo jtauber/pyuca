@@ -82,7 +82,8 @@ table) and a value of ``secondary`` (or ``primary``) will consider ``a`` and
 
 ### alternate
 
-Not yet implemented (defaults to ``non-ignorable``).
+Takes the values ``non-ignorable`` and ``shifted`` and defaults to
+``non-ignorable``.
 
 ### backwards
 

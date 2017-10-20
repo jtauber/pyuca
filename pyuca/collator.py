@@ -16,7 +16,7 @@ except NameError:
 
 COLL_ELEMENT_PATTERN = re.compile(r"""
     \[
-    (?:\*|\.)
+    (\*|\.)
     ([0-9A-Fa-f]{4})
     \.
     ([0-9A-Fa-f]{4})
@@ -59,6 +59,8 @@ class BaseCollator(object):
             "identical": 5
         }[settings["strength"]]
 
+        self.variable_weighting = settings["alternate"]
+
         self.normalization = {
             "on": True,
             "off": False,
@@ -86,11 +88,14 @@ class BaseCollator(object):
 
                 a, b = line.split(";", 1)
                 char_list = hexstrings2int(a.split())
-                coll_elements = []
+                ce_with_var_tag_list = []
                 for x in COLL_ELEMENT_PATTERN.finditer(b.strip()):
-                    weights = x.groups()
-                    coll_elements.append(hexstrings2int(weights))
-                self.table.add(char_list, coll_elements)
+                    [v, l1w, l2w, l3w] = x.groups()
+                    is_variable = {"*": True, ".": False}[v]
+                    weights = [l1w, l2w, l3w]
+                    ce_with_var_tag_list.append((is_variable,
+                                                 hexstrings2int(weights)))
+                self.table.add(char_list, ce_with_var_tag_list)
 
     def collation_elements(self, normalized_string):
         """
@@ -100,6 +105,7 @@ class BaseCollator(object):
         """  # noqa: E501
         collation_elements = []
 
+        vw_state = None  # S2.3
         lookup_key = self.build_lookup_key(normalized_string)
         while lookup_key:
             (S,  # S2.1
@@ -128,15 +134,59 @@ class BaseCollator(object):
                 codepoint = lookup_key.pop(0)
                 value = self.implicit_weight(codepoint)
 
-            # Assumption: non-ignorable option for variable collation
-            # elements.  This entails skipping step S2.3 of the
-            # algorithm.
+            ce_with_var_tag_list = value  # S2.2
 
-            collation_elements.extend(value)  # S2.4
+            # Consider past collation elements in distinct invocations
+            # of variable weighting.
+            (vw_state, ces) = self.collation_elements_with_variable_weighting(ce_with_var_tag_list,  # S2.3 # noqa: E501
+                                                                              vw_state)  # noqa: E501
+
+            collation_elements.extend(ces)  # S2.4
 
             # S2.5
 
         return collation_elements
+
+    def collation_elements_with_variable_weighting(self, ce_with_var_tag_list,
+                                                   state):
+        """
+        Produce collation elements transforming variable elements
+        according to the variable-weight setting.
+
+        Reference algorithm: https://www.unicode.org/reports/tr10/tr10-36.html#Variable_Weighting
+        """  # noqa: E501
+        if self.variable_weighting == "non-ignorable":
+            return (state, [ce for (_, ce) in ce_with_var_tag_list])
+        elif self.variable_weighting == "shifted":
+            (_, is_previous_variable) = (("vw_state_shifted", False)
+                                         if (state is None)
+                                         else state)
+            ce_list = []
+            for is_variable, ce in ce_with_var_tag_list:
+                l1 = ce[0]
+                l2 = ce[1]  # XXX How does spec guarantee this is defined?
+                l3 = ce[2]  # XXX How does spec guarantee this is defined?
+                if (l1 == 0) and (l2 == 0) and (l3 == 0):
+                    weighted_ce = [0, 0, 0, 0]
+                elif (l1 == 0) and (l3 != 0) and is_previous_variable:
+                    weighted_ce = [0, 0, 0, 0]
+                elif (l1 != 0) and is_variable:
+                    weighted_ce = [0, 0, 0, l1]
+                elif (l1 == 0) and (l3 != 0) and (not is_previous_variable):
+                    weighted_ce = [l1, l2, l3, int("FFFF", 16)]
+                elif (l1 != 0) and (not is_variable):
+                    weighted_ce = [l1, l2, l3, int("FFFF", 16)]
+                ce_list.append(weighted_ce)
+                if (l1 == 0):
+                    # Consider sequences of ignorable collation
+                    # elements in variable weighting.
+                    is_previous_variable = is_previous_variable
+                else:
+                    is_previous_variable = is_variable
+            new_state = ("vw_state_shifted", is_previous_variable)
+            return (new_state, ce_list)
+        else:
+            raise NotImplementedError(self.variable_weighting)
 
     def sort_key_from_collation_elements(self, collation_elements):
         """
@@ -223,7 +273,9 @@ class BaseCollator(object):
                 aaaa = base + (cp >> 15)
                 bbbb = (cp & 0x7FFF) | 0x8000
 
-        return [[aaaa, 0x0020, 0x002], [bbbb, 0x0000, 0x0000]]
+        collation_elements = [[aaaa, 0x0020, 0x002], [bbbb, 0x0000, 0x0000]]
+        is_variable = False
+        return [(is_variable, ce) for ce in collation_elements]
 
     def build_lookup_key(self, text):
         return [ord(ch) for ch in text]

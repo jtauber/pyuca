@@ -14,6 +14,7 @@ script:
   - coverage run --branch --source pyuca test.py
   - coverage run --append --branch --source pyuca -m doctest pyuca/utils.py
   - coverage run --append --branch --source pyuca uca_conformance_non_ignorable_test.py
+  - coverage run --append --branch --source pyuca uca_conformance_shifted_test.py
 after_success:
   - coveralls
 sudo: false
