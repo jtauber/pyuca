@@ -71,13 +71,21 @@ class BaseCollator(object):
                 self.table.add(char_list, coll_elements)
 
     def collation_elements(self, normalized_string):
+        """
+        Produce the array of collation elements for a string from its NFD form.
+
+        Reference algorithm: https://www.unicode.org/reports/tr10/tr10-36.html#Step_2
+        """  # noqa: E501
         collation_elements = []
 
         lookup_key = self.build_lookup_key(normalized_string)
         while lookup_key:
-            S, value, lookup_key = self.table.find_prefix(lookup_key)
+            (S,  # S2.1
+             value,  # S2.2
+             lookup_key) = self.table.find_prefix(lookup_key)
 
             # handle non-starters
+            # S2.1.1 ???
 
             last_class = None
             for i, C in enumerate(lookup_key):
@@ -85,40 +93,91 @@ class BaseCollator(object):
                 if combining_class == 0 or combining_class == last_class:
                     break
                 last_class = combining_class
+                # S2.1.2 ???
                 # C is a non-starter that is not blocked from S
                 x, y, z = self.table.find_prefix(S + [C])
-                if z == [] and y is not None:
+                if z == [] and y is not None:  # S2.1.3 ???
                     lookup_key = lookup_key[:i] + lookup_key[i + 1:]
-                    value = y
+                    value = y  # S2.2
                     break  # ???
 
-            if not value:
+            if not value:  # S2.2
 
                 codepoint = lookup_key.pop(0)
                 value = self.implicit_weight(codepoint)
 
-            collation_elements.extend(value)
+            # Assumption: non-ignorable option for variable collation
+            # elements.  This entails skipping step S2.3 of the
+            # algorithm.
+
+            collation_elements.extend(value)  # S2.4
+
+            # S2.5
 
         return collation_elements
 
-    def sort_key_from_collation_elements(self, collation_elements):
+    def sort_key_from_collation_elements(self, collation_elements,
+                                         max_level=4, level_sep=0):
+        """
+        Produce the sort key for a string from its array of collation elements.
+
+        Reference algorithm: https://www.unicode.org/reports/tr10/tr10-36.html#Step_3
+        """  # noqa: E501
         sort_key = []
 
-        for level in range(4):
-            if level:
-                sort_key.append(0)  # level separator
-            for element in collation_elements:
-                if len(element) > level:
-                    ce_l = element[level]
-                    if ce_l:
+        available_levels = max([len(ce) for ce in collation_elements])
+        for level in range(min(max_level, available_levels)):  # S3.1
+            if level > 0:  # S3.2
+                sort_key.append(level_sep)
+
+            # Assumption: collation element table is forwards (as
+            # opposed to backwards) at this level.  This entails
+            # following branch S3.3 of the algorithm and ignoring
+            # branch S3.6 (and its children steps S3.7 S3.8 S3.9).
+            for ce in collation_elements:  # S3.4
+
+                # Not appending anything for collation elements
+                # without weight at this level is equivalent to
+                # defaulting such weight to zero - see S3.5.
+                if len(ce) > level:
+                    ce_l = ce[level]
+                    if ce_l > 0:  # S3.5
                         sort_key.append(ce_l)
+
+        # According to the algorithm at
+        # https://www.unicode.org/reports/tr10/tr10-36.html#Step_3 the
+        # sort key does not have to end with a level separator.  See
+        # also examples at
+        # https://www.unicode.org/reports/tr10/tr10-36.html#Array_To_Sort_Key_Table
+        # and
+        # https://www.unicode.org/reports/tr10/tr10-36.html#Comparison_Of_Sort_Keys_Table
+        #
+        # However the conformance tests at
+        # https://www.unicode.org/Public/UCA/10.0.0/CollationTest.html
+        # include in (non-normative) comments "a representation of the
+        # sort key" always ending with "|]" where the vertical bar
+        # stands for "the ZERO separator".
+        #
+        # Append a final unnecessary level separator for the sake of
+        # readability following the comments in the conformance tests.
+        # This entails unnecessary additional memory usage.
+        sort_key.append(level_sep)
+
+        # Assumption: no deterministic (sometimes called stable or
+        # semi-stable) comparison required.  This entails skipping
+        # step S3.10 of the algorithm.
 
         return tuple(sort_key)
 
     def sort_key(self, string):
-        normalized_string = unicodedata.normalize("NFD", string)
-        collation_elements = self.collation_elements(normalized_string)
-        return self.sort_key_from_collation_elements(collation_elements)
+        """
+        Produce the sort key for the input string.
+
+        Reference algorithm: https://www.unicode.org/reports/tr10/tr10-36.html#Main_Algorithm
+        """  # noqa: E501
+        normalized_string = unicodedata.normalize("NFD", string)  # S1.1
+        collation_elements = self.collation_elements(normalized_string)  # S2
+        return self.sort_key_from_collation_elements(collation_elements)  # S3
 
     def implicit_weight(self, cp):
         if (
