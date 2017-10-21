@@ -16,7 +16,7 @@ except NameError:
 
 COLL_ELEMENT_PATTERN = re.compile(r"""
     \[
-    (?:\*|\.)
+    (\*|\.)
     ([0-9A-Fa-f]{4})
     \.
     ([0-9A-Fa-f]{4})
@@ -64,13 +64,16 @@ class BaseCollator(object):
 
                 a, b = line.split(";", 1)
                 char_list = hexstrings2int(a.split())
-                coll_elements = []
+                ce_with_var_tag_list = []
                 for x in COLL_ELEMENT_PATTERN.finditer(b.strip()):
-                    weights = x.groups()
-                    coll_elements.append(hexstrings2int(weights))
-                self.table.add(char_list, coll_elements)
+                    [v, l1w, l2w, l3w] = x.groups()
+                    is_variable = {"*": True, ".": False}[v]
+                    weights = [l1w, l2w, l3w]
+                    ce_with_var_tag_list.append((is_variable,
+                                                 hexstrings2int(weights)))
+                self.table.add(char_list, ce_with_var_tag_list)
 
-    def collation_elements(self, normalized_string):
+    def collation_elements(self, normalized_string, variable_weighting):
         """
         Produce the array of collation elements for a string from its NFD form.
 
@@ -106,15 +109,47 @@ class BaseCollator(object):
                 codepoint = lookup_key.pop(0)
                 value = self.implicit_weight(codepoint)
 
-            # Assumption: non-ignorable option for variable collation
-            # elements.  This entails skipping step S2.3 of the
-            # algorithm.
+            ce_with_var_tag_list = value  # S2.2
 
-            collation_elements.extend(value)  # S2.4
+            ces = self.collation_elements_with_variable_weighting(ce_with_var_tag_list, variable_weighting)  # S2.3 # noqa: E501
+
+            collation_elements.extend(ces)  # S2.4
 
             # S2.5
 
         return collation_elements
+
+    def collation_elements_with_variable_weighting(self, ce_with_var_tag_list, vw):  # noqa: E501
+        """
+        Produce collation elements transforming variable elements
+        according to the variable-weight setting.
+
+        Reference algorithm: https://www.unicode.org/reports/tr10/tr10-36.html#Variable_Weighting
+        """  # noqa: E501
+        if vw == "non-ignorable":
+            return [ce for (_, ce) in ce_with_var_tag_list]
+        elif vw == "shifted":
+            is_previous_variable = False
+            ce_list = []
+            for is_variable, ce in ce_with_var_tag_list:
+                l1 = ce[0]
+                l2 = ce[1]  # XXX How does spec guarantee this is defined?
+                l3 = ce[2]  # XXX How does spec guarantee this is defined?
+                if (l1 == 0) and (l2 == 0) and (l3 == 0):
+                    weighted_ce = [0, 0, 0, 0]
+                elif (l1 == 0) and (l3 != 0) and is_previous_variable:
+                    weighted_ce = [0, 0, 0, 0]
+                elif (l1 != 0) and is_variable:
+                    weighted_ce = [0, 0, 0, l1]
+                elif (l1 == 0) and (l3 != 0) and (not is_previous_variable):
+                    weighted_ce = [l1, l2, l3, int("FFFF", 16)]
+                elif (l1 != 0) and (not is_variable):
+                    weighted_ce = [l1, l2, l3, int("FFFF", 16)]
+                ce_list.append(weighted_ce)
+                is_previous_variable = is_variable
+            return ce_list
+        else:
+            raise NotImplementedError(vw)
 
     def sort_key_from_collation_elements(self, collation_elements,
                                          max_level=4, level_sep=0):
@@ -169,14 +204,15 @@ class BaseCollator(object):
 
         return tuple(sort_key)
 
-    def sort_key(self, string):
+    def sort_key(self, string, variable_weighting="non-ignorable"):
         """
         Produce the sort key for the input string.
 
         Reference algorithm: https://www.unicode.org/reports/tr10/tr10-36.html#Main_Algorithm
         """  # noqa: E501
         normalized_string = unicodedata.normalize("NFD", string)  # S1.1
-        collation_elements = self.collation_elements(normalized_string)  # S2
+        collation_elements = self.collation_elements(normalized_string,
+                                                     variable_weighting)  # S2
         return self.sort_key_from_collation_elements(collation_elements)  # S3
 
     def implicit_weight(self, cp):
@@ -219,7 +255,9 @@ class BaseCollator(object):
                 aaaa = base + (cp >> 15)
                 bbbb = (cp & 0x7FFF) | 0x8000
 
-        return [[aaaa, 0x0020, 0x002], [bbbb, 0x0000, 0x0000]]
+        collation_elements = [[aaaa, 0x0020, 0x002], [bbbb, 0x0000, 0x0000]]
+        is_variable = False
+        return [(is_variable, ce) for ce in collation_elements]
 
     def build_lookup_key(self, text):
         return [ord(ch) for ch in text]

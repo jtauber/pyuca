@@ -61,7 +61,8 @@ for coll in collators:
                 test_string = "".join(
                     chr(int(point, 16)) for point in points
                 )
-                test_string_sort_key = c.sort_key(test_string)  # TODO shifted
+                test_string_sort_key = c.sort_key(test_string,
+                                                  variable_weighting="shifted")
                 if prev_sort_key:
                     if prev_sort_key > test_string_sort_key:
                         failure += 1
