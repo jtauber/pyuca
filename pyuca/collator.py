@@ -101,12 +101,13 @@ class BaseCollator(object):
 
         return collation_elements
 
-    def sort_key_from_collation_elements(self, collation_elements):
+    def sort_key_from_collation_elements(self, collation_elements,
+                                         max_level=4, level_sep=0):
         sort_key = []
 
-        for level in range(4):
+        for level in range(max_level):
             if level:
-                sort_key.append(0)  # level separator
+                sort_key.append(level_sep)
             for element in collation_elements:
                 if len(element) > level:
                     ce_l = element[level]
