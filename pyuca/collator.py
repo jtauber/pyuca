@@ -105,7 +105,8 @@ class BaseCollator(object):
                                          max_level=4, level_sep=0):
         sort_key = []
 
-        for level in range(max_level):
+        available_levels = max([len(ce) for ce in collation_elements])
+        for level in range(min(max_level, available_levels)):
             if level:
                 sort_key.append(level_sep)
             for element in collation_elements:
@@ -113,6 +114,25 @@ class BaseCollator(object):
                     ce_l = element[level]
                     if ce_l:
                         sort_key.append(ce_l)
+
+        # According to the algorithm at
+        # https://www.unicode.org/reports/tr10/tr10-36.html#Step_3 the
+        # sort key does not have to end with a level separator.  See
+        # also examples at
+        # https://www.unicode.org/reports/tr10/tr10-36.html#Array_To_Sort_Key_Table
+        # and
+        # https://www.unicode.org/reports/tr10/tr10-36.html#Comparison_Of_Sort_Keys_Table
+        #
+        # However the conformance tests at
+        # https://www.unicode.org/Public/UCA/10.0.0/CollationTest.html
+        # include in (non-normative) comments "a representation of the
+        # sort key" always ending with "|]" where the vertical bar
+        # stands for "the ZERO separator".
+        #
+        # Append a final unnecessary level separator for the sake of
+        # readability following the comments in the conformance tests.
+        # This entails unnecessary additional memory usage.
+        sort_key.append(level_sep)
 
         return tuple(sort_key)
 
