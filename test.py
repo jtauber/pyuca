@@ -119,7 +119,6 @@ class FromFullTest(unittest.TestCase):
         from pyuca import Collator
         super(FromFullTest, self).__init__(*args, **kwargs)
         self.c = Collator()
-        (0, 74, 33, 0, 2, 2, 0)
 
     @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
     def test_1(self):
