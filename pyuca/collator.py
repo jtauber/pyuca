@@ -81,6 +81,7 @@ class BaseCollator(object):
         """  # noqa: E501
         collation_elements = []
 
+        vw_state = None  # S2.3
         lookup_key = self.build_lookup_key(normalized_string)
         while lookup_key:
             (S,  # S2.1
@@ -111,7 +112,8 @@ class BaseCollator(object):
 
             ce_with_var_tag_list = value  # S2.2
 
-            ces = self.collation_elements_with_variable_weighting(ce_with_var_tag_list, variable_weighting)  # S2.3 # noqa: E501
+            (vw_state, ces) = self.collation_elements_with_variable_weighting(ce_with_var_tag_list,  # S2.3 # noqa: E501
+                                                                              variable_weighting, vw_state)  # noqa: E501
 
             collation_elements.extend(ces)  # S2.4
 
@@ -119,7 +121,8 @@ class BaseCollator(object):
 
         return collation_elements
 
-    def collation_elements_with_variable_weighting(self, ce_with_var_tag_list, vw):  # noqa: E501
+    def collation_elements_with_variable_weighting(self, ce_with_var_tag_list,
+                                                   vw, state):
         """
         Produce collation elements transforming variable elements
         according to the variable-weight setting.
@@ -127,9 +130,11 @@ class BaseCollator(object):
         Reference algorithm: https://www.unicode.org/reports/tr10/tr10-36.html#Variable_Weighting
         """  # noqa: E501
         if vw == "non-ignorable":
-            return [ce for (_, ce) in ce_with_var_tag_list]
+            return (state, [ce for (_, ce) in ce_with_var_tag_list])
         elif vw == "shifted":
-            is_previous_variable = False
+            (_, is_previous_variable) = (("vw_state_shifted", False)
+                                         if (state is None)
+                                         else state)
             ce_list = []
             for is_variable, ce in ce_with_var_tag_list:
                 l1 = ce[0]
@@ -147,7 +152,8 @@ class BaseCollator(object):
                     weighted_ce = [l1, l2, l3, int("FFFF", 16)]
                 ce_list.append(weighted_ce)
                 is_previous_variable = is_variable
-            return ce_list
+            new_state = ("vw_state_shifted", is_previous_variable)
+            return (new_state, ce_list)
         else:
             raise NotImplementedError(vw)
 
