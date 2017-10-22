@@ -151,7 +151,10 @@ class BaseCollator(object):
                 elif (l1 != 0) and (not is_variable):
                     weighted_ce = [l1, l2, l3, int("FFFF", 16)]
                 ce_list.append(weighted_ce)
-                is_previous_variable = is_variable
+                if (l1 == 0):
+                    is_previous_variable = is_previous_variable
+                else:
+                    is_previous_variable = is_variable
             new_state = ("vw_state_shifted", is_previous_variable)
             return (new_state, ce_list)
         else:
