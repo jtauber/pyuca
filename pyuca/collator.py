@@ -37,17 +37,17 @@ class BaseCollator(object):
     CJK_IDEOGRAPHS_EXT_E = False  # 8.0
     CJK_IDEOGRAPHS_EXT_F = False  # 10.0
 
-    def __init__(self, filename=None):
-        if filename is None:
-            filename = os.path.join(
+    def __init__(self, ce_table_filename=None):
+        if ce_table_filename is None:
+            ce_table_filename = os.path.join(
                 os.path.dirname(__file__),
                 "allkeys-{0}.txt".format(self.UCA_VERSION))
         self.table = Trie()
         self.implicit_weights = []
-        self.load(filename)
+        self.load(ce_table_filename)
 
-    def load(self, filename):
-        with open(filename) as keys_file:
+    def load(self, ce_table_filename):
+        with open(ce_table_filename) as keys_file:
             for line in keys_file:
                 line = line.split("#", 1)[0].rstrip()
 
