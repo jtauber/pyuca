@@ -15,6 +15,8 @@ Unicode 6.3.0 (Python 3.3+), Unicode 8.0.0 (Python 3.5+), Unicode 9.0.0
 (Python 3.6+), and Unicode 10.0.0 (Python 3.7+) with a variable-weighting
 setting of Non-ignorable.
 
+
+
 ## What do you use it for?
 
 In short, sorting non-English strings properly.
@@ -33,6 +35,7 @@ beginnings with ``c``. **Expansion** is where a single letter is treated as
 though it were multiple letters. In German, ``ä`` is sorted as if it were
 ``ae``, i.e. after ``ad`` but before ``af``.
 
+
 ## How to use it
 
 Here is how to use the ``pyuca`` module.
@@ -48,13 +51,52 @@ Usage example:
     assert sorted(["cafe", "caff", "café"], key=c.sort_key) == ["cafe", "café", "caff"]
 
 ``Collator`` can also take an optional filename for specifying a custom
-collation element table.
+collation element table as well as some keyword arguments to override the
+default behavior.
 
 You can also import collators for specific Unicode versions,
 e.g. `from pyuca.collator import Collator_8_0_0`.
 But just `from pyuca import Collator` will ensure that the collator version
 matches the version of `unicodata` provided by the standard library for your
 version of Python.
+
+
+## Settings
+
+``Collator`` can take zero or more of the following as keyword arguments:
+
+* ``strength``
+* ``alternate``
+* ``backwards``
+* ``normalization``
+
+### strength
+
+Takes the values ``primary``, ``secondary``, ``tertiary``, ``quaternary`` and
+``identical`` and defaults to ``tertiary``.
+
+Only considers levels up to the one given. For example, a value of ``primary``
+will consider ``a`` and ``á`` the same (assuming the default collation element
+table) and a value of ``secondary`` (or ``primary``) will consider ``a`` and
+``A`` the same (again, assuming the default collation element table).
+
+### alternate
+
+Takes the values ``non-ignorable`` and ``shifted`` and defaults to
+``non-ignorable``.
+
+### backwards
+
+Not yet implemented (defaults to ``off``).
+
+### normalization
+
+Takes the values ``on`` and ``off``, and defaults to ``on``.
+
+If ``on``, the strings to be collated are first normalized to NFD. If your
+strings are known to already be in NFD, you can set ``normalization`` to
+``off`` for better performance.
+
 
 ## How to cite it
 
