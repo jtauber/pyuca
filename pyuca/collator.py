@@ -37,17 +37,39 @@ class BaseCollator(object):
     CJK_IDEOGRAPHS_EXT_E = False  # 8.0
     CJK_IDEOGRAPHS_EXT_F = False  # 10.0
 
-    def __init__(self, filename=None):
-        if filename is None:
-            filename = os.path.join(
+    def __init__(self, ce_table_filename=None, **custom_settings):
+        if ce_table_filename is None:
+            ce_table_filename = os.path.join(
                 os.path.dirname(__file__),
                 "allkeys-{0}.txt".format(self.UCA_VERSION))
+
+        settings = {
+            "strength": "tertiary",
+            "alternate": "non-ignorable",
+            "backwards": "off",
+            "normalization": "on",
+        }
+        settings.update(custom_settings)
+
+        self.max_level = {
+            "primary": 1,
+            "secondary": 2,
+            "tertiary": 3,
+            "quaternary": 4,
+            "identical": 5
+        }[settings["strength"]]
+
+        self.normalization = {
+            "on": True,
+            "off": False,
+        }[settings["normalization"]]
+
         self.table = Trie()
         self.implicit_weights = []
-        self.load(filename)
+        self.load(ce_table_filename)
 
-    def load(self, filename):
-        with open(filename) as keys_file:
+    def load(self, ce_table_filename):
+        with open(ce_table_filename) as keys_file:
             for line in keys_file:
                 line = line.split("#", 1)[0].rstrip()
 
@@ -104,7 +126,7 @@ class BaseCollator(object):
     def sort_key_from_collation_elements(self, collation_elements):
         sort_key = []
 
-        for level in range(4):
+        for level in range(self.max_level):
             if level:
                 sort_key.append(0)  # level separator
             for element in collation_elements:
@@ -116,7 +138,10 @@ class BaseCollator(object):
         return tuple(sort_key)
 
     def sort_key(self, string):
-        normalized_string = unicodedata.normalize("NFD", string)
+        if self.normalization:
+            normalized_string = unicodedata.normalize("NFD", string)
+        else:
+            normalized_string = string
         collation_elements = self.collation_elements(normalized_string)
         return self.sort_key_from_collation_elements(collation_elements)
 
