@@ -1,19 +1,20 @@
 language: python
 python:
-  - "2.7"
   - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
+before_install:
+  - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python - -y --preview
+  - source $HOME/.poetry/env
 install:
-  - pip install flake8
-  - pip install coveralls
+  - poetry install
 script:
-  - flake8 .
-  - coverage run --branch --source pyuca test.py
-  - coverage run --append --branch --source pyuca -m doctest pyuca/utils.py
-  - coverage run --append --branch --source pyuca full_test.py
+  - poetry run flake8 .
+  - poetry run coverage run --branch --source pyuca test.py
+  - poetry run coverage run --append --branch --source pyuca -m doctest pyuca/utils.py
+  - poetry run coverage run --append --branch --source pyuca full_test.py
 after_success:
-  - coveralls
+  - poetry run coveralls
 sudo: false

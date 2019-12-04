@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "pyuca"
+version = "1.2"
+description = "a Python implementation of the Unicode Collation Algorithm"
+license = "MIT"
+readme = "README.md"
+repository = "http://github.com/jtauber/pyuca"
+authors = ["James Tauber <jtauber@jtauber.com>"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.4",
+  "Programming Language :: Python :: 3.5",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Topic :: Text Processing"
+]
+packages = [
+  { include = "pyuca" },
+  { include = "AUTHORS", format = "sdist" },
+  { include = "test.py", format = "sdist" },
+  { include = "full_test.py", format = "sdist" },
+  { include = "CollationTest", format = "sdist" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.4"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^3.7.9"
+coveralls = "^1.9.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
