@@ -10,6 +10,8 @@ setup(
     author_email="jtauber@jtauber.com",
     packages=["pyuca"],
     package_data={"": [
+        "py.typed",
+        "*.pyi",
         "allkeys-5.2.0.txt",
         "allkeys-6.3.0.txt",
         "allkeys-8.0.0.txt",

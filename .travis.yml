@@ -16,4 +16,21 @@ script:
   - coverage run --append --branch --source pyuca full_test.py
 after_success:
   - coveralls
+jobs:
+  include:
+    - name: "check typings"
+      python: 3.8
+      install: |
+        set -e
+        pip install mypy
+      script: |
+        set -e
+        mypy --python-version 3.8 pyuca
+        mypy --python-version 3.7 pyuca
+        mypy --python-version 3.6 pyuca
+        mypy --python-version 3.5 pyuca
+        mypy --python-version 3.4 pyuca
+        mypy --python-version 2.7 pyuca
+      after_success: |
+        echo "done"
 sudo: false
