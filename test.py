@@ -1,11 +1,6 @@
-# coding: utf8
-from __future__ import unicode_literals
-
 import sys
 import unittest
 
-PYTHON3 = sys.version_info >= (3,)
-V8_0_0 = sys.version_info >= (3, 5)
 V10_0_0 = sys.version_info >= (3, 7)
 
 
@@ -90,88 +85,10 @@ class FromFullTest(unittest.TestCase):
         self.c = Collator()
         (0, 74, 33, 0, 2, 2, 0)
 
-    @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
     def test_1(self):
         self.assertEqual(
             self.c.sort_key("\u0332\u0334"),
             (0x0000, 0x004A, 0x0021, 0x0000, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
-    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
-    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
-    def test_2(self):
-        self.assertEqual(
-            self.c.sort_key("\u0430\u0306\u0334"),
-            (0x1991, 0x0000, 0x0020, 0x004A, 0x0000, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
-    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
-    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
-    def test_3(self):
-        self.assertEqual(
-            self.c.sort_key("\u0FB2\u0F71\u0001\u0F80\u0061"),
-            (0x2571, 0x2587, 0x258A, 0x15EB, 0x0000, 0x0020, 0x0020, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
-    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
-    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
-    def test_4(self):
-        self.assertEqual(
-            self.c.sort_key("\u4E00\u0021"),
-            (0xFB40, 0xCE00, 0x025D, 0x0000, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(not PYTHON3, "only matches Python 3's UCA version")
-    @unittest.skipIf(V8_0_0, "not for UCA version 8.0.0")
-    @unittest.skipIf(V10_0_0, "not for UCA version 10.0.0")
-    def test_5(self):
-        self.assertEqual(
-            self.c.sort_key("\u3400\u0021"),
-            (0xFB80, 0xB400, 0x025D, 0x0000, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(PYTHON3, "only matches the older Python 2's UCA version")
-    def test_1_old(self):
-        self.assertEqual(
-            self.c.sort_key("\u0332\u0334"),
-            (0x0000, 0x007C, 0x0021, 0x0000, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(PYTHON3, "only matches the older Python 2's UCA version")
-    def test_2_old(self):
-        self.assertEqual(
-            self.c.sort_key("\u0430\u0306\u0334"),
-            (0x15B0, 0x0000, 0x0020, 0x007C, 0x0000, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(PYTHON3, "only matches the older Python 2's UCA version")
-    def test_3_old(self):
-        self.assertEqual(
-            self.c.sort_key("\u0FB2\u0F71\u0001\u0F80\u0061"),
-            (0x205B, 0x206D, 0x2070, 0x120F, 0x0000, 0x0020, 0x0020, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(PYTHON3, "only matches the older Python 2's UCA version")
-    def test_4_old(self):
-        self.assertEqual(
-            self.c.sort_key("\u4E00\u0021"),
-            (0xFB40, 0xCE00, 0x026E, 0x0000, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
-        )
-
-    @unittest.skipIf(PYTHON3, "only matches the older Python 2's UCA version")
-    def test_5_old(self):
-        self.assertEqual(
-            self.c.sort_key("\u3400\u0021"),
-            (0xFB80, 0xB400, 0x026E, 0x0000, 0x0020,
-                0x0020, 0x0000, 0x0002, 0x0002, 0x0000)
         )
 
 
@@ -182,7 +99,6 @@ class FromFullTestV8_0_0(unittest.TestCase):
         super(FromFullTestV8_0_0, self).__init__(*args, **kwargs)
         self.c = Collator_8_0_0()
 
-    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
     def test_1(self):
         from pyuca.utils import format_sort_key
         self.assertEqual(
@@ -190,7 +106,6 @@ class FromFullTestV8_0_0(unittest.TestCase):
             "FB41 9FD5 1BDB | 0020 0020 | 0002 0002 |",
         )
 
-    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
     def test_2(self):
         from pyuca.utils import format_sort_key
         self.assertEqual(
@@ -198,7 +113,6 @@ class FromFullTestV8_0_0(unittest.TestCase):
             "FB85 CEA1 1BDB | 0020 0020 | 0002 0002 |",
         )
 
-    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
     def test_3(self):
         from pyuca.utils import format_sort_key
         self.assertEqual(
@@ -206,7 +120,6 @@ class FromFullTestV8_0_0(unittest.TestCase):
             "FBC5 B81E 1BDB | 0020 0020 | 0002 0002 |",
         )
 
-    @unittest.skipIf(not V8_0_0, "only matches UCA version 8.0.0")
     def test_4(self):
         from pyuca.utils import format_sort_key
         self.assertEqual(
