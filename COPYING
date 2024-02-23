@@ -1,0 +1,9 @@
+Pyuca is licensed under MIT, except for the Unicode Collation Element Tables (DUCET),
+which can be found in pyuca/allkeys*.txt. Those files are licensed under the terms of the
+Unicode License v3 (Unicode-3.0).
+
+The terms of the MIT license are included in LICENSE.
+The terms of the Unicode License v3 can be found in LICENSE-Unicode-3.0.
+
+More information on the Unicode Copyright and Terms of Use can be found online:
+https://www.unicode.org/copyright.html
