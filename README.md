@@ -63,8 +63,7 @@ Tauber, J. K. (2016). pyuca: a Python implementation of the Unicode Collation Al
 ## License
 
 Python code is made available under an MIT license (see `LICENSE`).
-`allkeys.txt` is made available under the similar license defined in
-`LICENSE-allkeys`.
+`pyuce/allkeys.*txt` are made available under the Unicode-3.0 license. A copy of which can be found in `LICENSE-Unicode-3.0`.
 
 ## Contacting the Developer
 
