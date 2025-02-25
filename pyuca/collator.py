@@ -4,7 +4,10 @@ import os.path
 import re
 import sys
 import unicodedata
+import importlib.abc
+import importlib.resources
 from io import open
+import pathlib
 
 from .trie import Trie
 from .utils import hexstrings2int
@@ -39,15 +42,15 @@ class BaseCollator(object):
 
     def __init__(self, filename=None):
         if filename is None:
-            filename = os.path.join(
-                os.path.dirname(__file__),
-                "allkeys-{0}.txt".format(self.UCA_VERSION))
+            filename = importlib.resources.files(__package__).joinpath("allkeys-{0}.txt".format(self.UCA_VERSION))
+        elif isinstance(filename, str):
+            filename = pathlib.Path(filename)
         self.table = Trie()
         self.implicit_weights = []
         self.load(filename)
 
     def load(self, filename):
-        with open(filename) as keys_file:
+        with filename.open() as keys_file:
             for line in keys_file:
                 line = line.split("#", 1)[0].rstrip()
 
