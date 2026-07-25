@@ -1,20 +1,28 @@
-from __future__ import unicode_literals
+"""Python implementation of the Unicode Collation Algorithm (UTS #10).
 
-import os.path
+The default :data:`Collator` is chosen to match the Unicode version of the
+running interpreter's :mod:`unicodedata` (``unicodedata.unidata_version``),
+because ``sort_key`` relies on that module for NFD normalization and combining
+classes. Version-specific collators (``Collator_16_0_0`` etc.) can also be
+imported directly.
+"""
+
+import gzip
 import re
-import sys
 import unicodedata
-from io import open
+from pathlib import Path
+from typing import IO, ClassVar
 
+from .implicit import CollationElements, ImplicitRange, implicit_weight
 from .trie import Trie
-from .utils import hexstrings2int
 
-try:
-    chr = unichr
-except NameError:
-    pass
+SortKey = tuple[int, ...]
+CollationTrie = Trie[int, CollationElements]
 
-COLL_ELEMENT_PATTERN = re.compile(r"""
+DATA_DIR = Path(__file__).resolve().parent
+
+COLL_ELEMENT_PATTERN = re.compile(
+    r"""
     \[
     (?:\*|\.)
     ([0-9A-Fa-f]{4})
@@ -23,86 +31,114 @@ COLL_ELEMENT_PATTERN = re.compile(r"""
     \.
     ([0-9A-Fa-f]{4})
     (?:\.[0-9A-Fa-f]{4,5})?
-\]
-""", re.X)
+    \]
+    """,
+    re.X,
+)
+
+# Parsed DUCET tables are shared across collator instances that load the same
+# file, so constructing another ``Collator()`` is essentially free.
+_TABLE_CACHE: dict[str, tuple[CollationTrie, list[ImplicitRange]]] = {}
 
 
-class BaseCollator(object):
-    CJK_IDEOGRAPHS_8_0_0 = False
-    CJK_IDEOGRAPHS_10_0_0 = False
-    CJK_IDEOGRAPHS_EXT_A = True  # 3.0
-    CJK_IDEOGRAPHS_EXT_B = True  # 3.1
-    CJK_IDEOGRAPHS_EXT_C = True  # 5.2 (supposedly)
-    CJK_IDEOGRAPHS_EXT_D = True  # 6.0
-    CJK_IDEOGRAPHS_EXT_E = False  # 8.0
-    CJK_IDEOGRAPHS_EXT_F = False  # 10.0
+def _open_ducet(path: Path) -> IO[str]:
+    if path.suffix == ".gz":
+        return gzip.open(path, "rt", encoding="utf-8")
+    return path.open(encoding="utf-8")
 
-    def __init__(self, filename=None):
+
+def _load_table(path: Path) -> tuple[CollationTrie, list[ImplicitRange]]:
+    cache_key = str(path)
+    cached = _TABLE_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    table: CollationTrie = Trie()
+    implicit_ranges: list[ImplicitRange] = []
+    base_origin: dict[int, int] = {}
+
+    with _open_ducet(path) as keys_file:
+        for raw_line in keys_file:
+            line = raw_line.split("#", 1)[0].rstrip()
+
+            if not line or line.startswith("@version"):
+                continue
+
+            if line.startswith("@implicitweights"):
+                ch_range, base_str = line[len("@implicitweights") :].split(";")
+                range_start, range_end = ch_range.split("..")
+                start = int(range_start, 16)
+                base = int(base_str, 16)
+                # Ranges sharing a base form one logical block; offsets are
+                # measured from the first (lowest) range with that base.
+                origin = base_origin.setdefault(base, start)
+                implicit_ranges.append((start, int(range_end, 16), base, origin))
+                continue
+
+            a, b = line.split(";", 1)
+            char_list = [int(hexstr, 16) for hexstr in a.split()]
+            coll_elements: CollationElements = [
+                [int(weight, 16) for weight in match.groups()]
+                for match in COLL_ELEMENT_PATTERN.finditer(b.strip())
+            ]
+            table.add(char_list, coll_elements)
+
+    result = (table, implicit_ranges)
+    _TABLE_CACHE[cache_key] = result
+    return result
+
+
+class BaseCollator:
+    UCA_VERSION: ClassVar[str] = ""
+
+    def __init__(self, filename: str | Path | None = None) -> None:
         if filename is None:
-            filename = os.path.join(
-                os.path.dirname(__file__),
-                "allkeys-{0}.txt".format(self.UCA_VERSION))
-        self.table = Trie()
-        self.implicit_weights = []
-        self.load(filename)
+            path = DATA_DIR / f"allkeys-{self.UCA_VERSION}.txt.gz"
+        else:
+            path = Path(filename)
+        self.table, self.implicit_ranges = _load_table(path)
 
-    def load(self, filename):
-        with open(filename) as keys_file:
-            for line in keys_file:
-                line = line.split("#", 1)[0].rstrip()
+    def implicit_weight(self, cp: int) -> CollationElements:
+        return implicit_weight(cp, self.implicit_ranges)
 
-                if not line or line.startswith("@version"):
-                    continue
+    def collation_elements(self, normalized_string: str) -> CollationElements:
+        collation_elements: CollationElements = []
 
-                if line.startswith("@implicitweights"):
-                    ch_range, base = line[len("@implicitweights"):].split(";")
-                    range_start, range_end = ch_range.split("..")
-                    self.implicit_weights.append([
-                        int(range_start, 16), int(range_end, 16), int(base, 16)
-                    ])
-                    continue
+        code_points = self.build_lookup_key(normalized_string)
+        i = 0
+        while i < len(code_points):
+            end, value = self.table.find_prefix_from(code_points, i)
 
-                a, b = line.split(";", 1)
-                char_list = hexstrings2int(a.split())
-                coll_elements = []
-                for x in COLL_ELEMENT_PATTERN.finditer(b.strip()):
-                    weights = x.groups()
-                    coll_elements.append(hexstrings2int(weights))
-                self.table.add(char_list, coll_elements)
-
-    def collation_elements(self, normalized_string):
-        collation_elements = []
-
-        lookup_key = self.build_lookup_key(normalized_string)
-        while lookup_key:
-            S, value, lookup_key = self.table.find_prefix(lookup_key)
-
-            # handle non-starters
-
-            last_class = None
-            for i, C in enumerate(lookup_key):
-                combining_class = unicodedata.combining(chr(C))
-                if combining_class == 0 or combining_class == last_class:
-                    break
-                last_class = combining_class
-                # C is a non-starter that is not blocked from S
-                x, y, z = self.table.find_prefix(S + [C])
-                if z == [] and y is not None:
-                    lookup_key = lookup_key[:i] + lookup_key[i + 1:]
-                    value = y
-                    break  # ???
-
-            if not value:
-
-                codepoint = lookup_key.pop(0)
-                value = self.implicit_weight(codepoint)
+            if value is not None:
+                # discontiguous contraction (UCA S2.1.3): try to absorb a
+                # following non-starter that is not blocked from the match S.
+                last_class = None
+                j = end
+                while j < len(code_points):
+                    combining_class = unicodedata.combining(chr(code_points[j]))
+                    if combining_class == 0 or combining_class == last_class:
+                        break
+                    last_class = combining_class
+                    candidate = code_points[i:end] + [code_points[j]]
+                    cand_end, cand_value = self.table.find_prefix_from(candidate)
+                    if cand_value is not None and cand_end == len(candidate):
+                        value = cand_value
+                        del code_points[j]
+                        break
+                    j += 1
+            else:
+                value = self.implicit_weight(code_points[i])
+                end = i + 1
 
             collation_elements.extend(value)
+            i = end
 
         return collation_elements
 
-    def sort_key_from_collation_elements(self, collation_elements):
-        sort_key = []
+    def sort_key_from_collation_elements(
+        self, collation_elements: CollationElements
+    ) -> SortKey:
+        sort_key: list[int] = []
 
         for level in range(4):
             if level:
@@ -115,113 +151,130 @@ class BaseCollator(object):
 
         return tuple(sort_key)
 
-    def sort_key(self, string):
+    def sort_key(self, string: str) -> SortKey:
         normalized_string = unicodedata.normalize("NFD", string)
         collation_elements = self.collation_elements(normalized_string)
         return self.sort_key_from_collation_elements(collation_elements)
 
-    def implicit_weight(self, cp):
-        if (
-            (unicodedata.category(chr(cp)) != "Cn") and (
-                0x4E00 <= cp <= 0x9FCC or
-                (self.CJK_IDEOGRAPHS_8_0_0 and 0x9FCD <= cp <= 0x9FD5) or
-                (self.CJK_IDEOGRAPHS_10_0_0 and 0x9FD6 <= cp <= 0x9FEA) or
-                cp in [
-                    0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F,
-                    0xFA21, 0xFA23, 0xFA24, 0xFA27, 0xFA28, 0xFA29,
-                ]
-            )
-        ):
-            base = 0xFB40
-            aaaa = base + (cp >> 15)
-            bbbb = (cp & 0x7FFF) | 0x8000
-        elif (
-            (unicodedata.category(chr(cp)) != "Cn") and (
-                (self.CJK_IDEOGRAPHS_EXT_A and 0x3400 <= cp <= 0x4DB5) or
-                (self.CJK_IDEOGRAPHS_EXT_B and 0x20000 <= cp <= 0x2A6D6) or
-                (self.CJK_IDEOGRAPHS_EXT_C and 0x2A700 <= cp <= 0x2B734) or
-                (self.CJK_IDEOGRAPHS_EXT_D and 0x2B740 <= cp <= 0x2B81D) or
-                (self.CJK_IDEOGRAPHS_EXT_E and 0x2B820 <= cp <= 0x2CEAF) or
-                (self.CJK_IDEOGRAPHS_EXT_F and 0x2CEB0 <= cp <= 0x2EBE0)
-            )
-        ):
-            base = 0xFB80
-            aaaa = base + (cp >> 15)
-            bbbb = (cp & 0x7FFF) | 0x8000
-        else:
-            aaaa = None
-            for (start, end, base) in self.implicit_weights:
-                if start <= cp <= end:
-                    aaaa = base
-                    bbbb = (cp - start) | 0x8000
-                    break
-            if aaaa is None:
-                base = 0xFBC0
-                aaaa = base + (cp >> 15)
-                bbbb = (cp & 0x7FFF) | 0x8000
-
-        return [[aaaa, 0x0020, 0x002], [bbbb, 0x0000, 0x0000]]
-
-    def build_lookup_key(self, text):
+    def build_lookup_key(self, text: str) -> list[int]:
         return [ord(ch) for ch in text]
 
 
-class Collator_6_3_0(BaseCollator):
-    UCA_VERSION = "6.3.0"
+_COLLATOR_REGISTRY: dict[str, type[BaseCollator]] = {}
 
 
-class Collator_8_0_0(BaseCollator):
-    UCA_VERSION = "8.0.0"
-    CJK_IDEOGRAPHS_8_0_0 = True
-    CJK_IDEOGRAPHS_EXT_E = True
+def _register(cls: type[BaseCollator]) -> type[BaseCollator]:
+    _COLLATOR_REGISTRY[cls.UCA_VERSION] = cls
+    return cls
 
 
-class Collator_9_0_0(BaseCollator):
-    UCA_VERSION = "9.0.0"
-    CJK_IDEOGRAPHS_8_0_0 = True
-    CJK_IDEOGRAPHS_EXT_E = True
+def _noncharacter_code_points() -> frozenset[int]:
+    points: set[int] = set()
+    for plane in range(17):
+        base = plane << 16
+        points.add(base + 0xFFFE)
+        points.add(base + 0xFFFF)
+    points.update(range(0xFDD0, 0xFDF0))
+    return frozenset(points)
 
 
-class Collator_10_0_0(BaseCollator):
-    UCA_VERSION = "10.0.0"
-    CJK_IDEOGRAPHS_8_0_0 = True
-    CJK_IDEOGRAPHS_10_0_0 = True
-    CJK_IDEOGRAPHS_EXT_E = True
-    CJK_IDEOGRAPHS_EXT_F = True
+_NONCHARACTERS = _noncharacter_code_points()
 
 
+@_register
 class Collator_5_2_0(BaseCollator):
     UCA_VERSION = "5.2.0"
-    # Supposedly, extension C *was* introduced in 5.2.0, but the tests show
-    # otherwise. Treat the tests as king.
-    CJK_IDEOGRAPHS_EXT_C = False
-    CJK_IDEOGRAPHS_EXT_D = False
 
-    non_char_code_points = []
-    for i in range(17):
-        base = i << 16
-        non_char_code_points.append(base + 0xFFFE)
-        non_char_code_points.append(base + 0xFFFF)
-    for i in range(32):
-        non_char_code_points.append(0xFDD0 + i)
-
-    def _valid_char(self, ch):
+    def _valid_char(self, ch: str) -> bool:
         category = unicodedata.category(ch)
         if category == "Cs":
             return False
         if category != "Cn":
             return True
-        return ord(ch) not in self.non_char_code_points
+        return ord(ch) not in _NONCHARACTERS
 
-    def build_lookup_key(self, text):
+    def build_lookup_key(self, text: str) -> list[int]:
         return [ord(ch) for ch in text if self._valid_char(ch)]
 
 
-if sys.version_info < (3,):
-    Collator = Collator_5_2_0
-elif sys.version_info[:2] == (3, 5):
-    Collator = Collator_8_0_0
-elif sys.version_info[:2] >= (3, 6):
-    Collator = Collator_9_0_0
-else:
-    Collator = Collator_6_3_0
+@_register
+class Collator_6_3_0(BaseCollator):
+    UCA_VERSION = "6.3.0"
+
+
+@_register
+class Collator_8_0_0(BaseCollator):
+    UCA_VERSION = "8.0.0"
+
+
+@_register
+class Collator_9_0_0(BaseCollator):
+    UCA_VERSION = "9.0.0"
+
+
+@_register
+class Collator_10_0_0(BaseCollator):
+    UCA_VERSION = "10.0.0"
+
+
+@_register
+class Collator_13_0_0(BaseCollator):
+    UCA_VERSION = "13.0.0"
+
+
+@_register
+class Collator_14_0_0(BaseCollator):
+    UCA_VERSION = "14.0.0"
+
+
+@_register
+class Collator_15_0_0(BaseCollator):
+    UCA_VERSION = "15.0.0"
+
+
+@_register
+class Collator_15_1_0(BaseCollator):
+    UCA_VERSION = "15.1.0"
+
+
+@_register
+class Collator_16_0_0(BaseCollator):
+    UCA_VERSION = "16.0.0"
+
+
+@_register
+class Collator_17_0_0(BaseCollator):
+    UCA_VERSION = "17.0.0"
+
+
+def _version_key(version: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in version.split("."))
+
+
+def available_versions() -> list[str]:
+    """Return the bundled UCA versions, oldest first."""
+    return sorted(_COLLATOR_REGISTRY, key=_version_key)
+
+
+def select_collator(unidata_version: str | None = None) -> type[BaseCollator]:
+    """Return the bundled collator best matching a Unicode version.
+
+    Prefers an exact match on ``unidata_version`` (defaulting to the running
+    interpreter's ``unicodedata.unidata_version``), otherwise the newest
+    bundled version that is not newer than it.
+    """
+    if unidata_version is None:
+        unidata_version = unicodedata.unidata_version
+
+    exact = _COLLATOR_REGISTRY.get(unidata_version)
+    if exact is not None:
+        return exact
+
+    runtime = _version_key(unidata_version)
+    candidates = available_versions()
+    not_newer = [v for v in candidates if _version_key(v) <= runtime]
+    chosen = not_newer[-1] if not_newer else candidates[-1]
+    return _COLLATOR_REGISTRY[chosen]
+
+
+Collator = select_collator()

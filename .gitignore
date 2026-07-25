@@ -2,7 +2,10 @@ __pycache__/
 *.pyc
 *.egg-info/
 dist/
-.coverage
-htmlcov/
-.tox/
 build/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.venv/

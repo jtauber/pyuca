@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync
+      - name: ruff (lint)
+        run: uv run ruff check pyuca scripts tests
+      - name: ruff (format)
+        run: uv run ruff format --check pyuca scripts tests
+      - name: pyright
+        run: uv run pyright
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        # Each interpreter's unicodedata pins a UCA version, so the conformance
+        # suite for 14.0.0 / 15.0.0 / 15.1.0 / 16.0.0 runs on its match here.
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: macos-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - run: uv sync
+      - name: pytest (with 100% coverage gate)
+        run: uv run pytest --cov
