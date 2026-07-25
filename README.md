@@ -1,19 +1,15 @@
 # pyuca: Python Unicode Collation Algorithm implementation
 
-[![Build Status](http://img.shields.io/travis/jtauber/pyuca.svg)](https://travis-ci.org/jtauber/pyuca)
-[![Coverage Status](http://img.shields.io/coveralls/jtauber/pyuca.svg)](https://coveralls.io/r/jtauber/pyuca?branch=master)
-![MIT License](http://img.shields.io/badge/license-MIT-brightgreen.svg)
-
+[![CI](https://github.com/jtauber/pyuca/actions/workflows/ci.yml/badge.svg)](https://github.com/jtauber/pyuca/actions/workflows/ci.yml)
+![MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg)
 [![DOI](https://zenodo.org/badge/3769/jtauber/pyuca.svg)](https://zenodo.org/badge/latestdoi/3769/jtauber/pyuca)
-[![JOSS](http://joss.theoj.org/papers/10.21105/joss.00021/status.svg)](http://joss.theoj.org/papers/10.21105/joss.00021)
-
+[![JOSS](https://joss.theoj.org/papers/10.21105/joss.00021/status.svg)](https://joss.theoj.org/papers/10.21105/joss.00021)
 
 This is a Python implementation of the
-[Unicode Collation Algorithm (UCA)](http://unicode.org/reports/tr10/). It
-passes 100% of the UCA conformance tests for Unicode 5.2.0 (Python 2.7),
-Unicode 6.3.0 (Python 3.3+), Unicode 8.0.0 (Python 3.5+), Unicode 9.0.0
-(Python 3.6+), and Unicode 10.0.0 (Python 3.7+) with a variable-weighting
-setting of Non-ignorable.
+[Unicode Collation Algorithm (UCA)](https://www.unicode.org/reports/tr10/). It
+passes 100% of the UCA conformance tests for every bundled Unicode version
+(5.2.0 through 17.0.0) with a variable-weighting setting of Non-ignorable, when
+run on an interpreter whose Unicode version matches (see *Versioning* below).
 
 ## What do you use it for?
 
@@ -35,7 +31,7 @@ though it were multiple letters. In German, ``ä`` is sorted as if it were
 
 ## How to use it
 
-Here is how to use the ``pyuca`` module.
+Requires Python 3.11+.
 
     pip install pyuca
 
@@ -48,13 +44,36 @@ Usage example:
     assert sorted(["cafe", "caff", "café"], key=c.sort_key) == ["cafe", "café", "caff"]
 
 ``Collator`` can also take an optional filename for specifying a custom
-collation element table.
+collation element table (either a plain ``allkeys.txt`` or a gzipped one).
 
-You can also import collators for specific Unicode versions,
-e.g. `from pyuca.collator import Collator_8_0_0`.
-But just `from pyuca import Collator` will ensure that the collator version
-matches the version of `unicodata` provided by the standard library for your
-version of Python.
+## Versioning
+
+`sort_key` relies on the standard library's `unicodedata` for NFD
+normalization, so a collation is only correct when the DUCET table matches the
+interpreter's Unicode version. `from pyuca import Collator` therefore selects
+the bundled table matching `unicodedata.unidata_version` automatically:
+
+| Python | Unicode | Collator selected |
+| ------ | ------- | ----------------- |
+| 3.11   | 14.0.0  | `Collator_14_0_0` |
+| 3.12   | 15.0.0  | `Collator_15_0_0` |
+| 3.13   | 15.1.0  | `Collator_15_1_0` |
+| 3.14   | 16.0.0  | `Collator_16_0_0` |
+
+To pin a specific version regardless of the interpreter, import it directly:
+
+    from pyuca.collator import Collator_16_0_0
+    c = Collator_16_0_0()
+
+Bundled tables (`Collator_5_2_0`, `Collator_6_3_0`, `Collator_8_0_0`,
+`Collator_9_0_0`, `Collator_10_0_0`, `Collator_13_0_0` … `Collator_17_0_0`)
+remain importable for reproducibility; `17.0.0` is included ahead of a CPython
+release that ships Unicode 17.
+
+> **Upgrading from 1.x?** 2.0 drops Python 2 and no longer picks the collator
+> from `sys.version_info`. On modern Pythons the default previously resolved to
+> UCA 9.0.0 (2016); it now tracks the runtime's Unicode version, so sort keys
+> for characters added since then will differ.
 
 ## How to cite it
 
